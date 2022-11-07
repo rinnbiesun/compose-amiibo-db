@@ -60,6 +60,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+    implementation(libs.gson)
+    implementation(libs.okhttp3.logging.interceptor)
+    implementation(libs.retrofit2.converter.gson)
+    implementation(libs.retrofit2)
 
     // Compose
     implementation(libs.androidx.activity.compose)
