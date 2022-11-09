@@ -1,5 +1,6 @@
 package com.rinnbie.amiibodb.api
 
+import com.rinnbie.amiibodb.data.AmiiboResponse
 import com.rinnbie.amiibodb.data.SeriesResponse
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -8,6 +9,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 
 interface AmiiboService {
+
+    @GET("amiibo/")
+    suspend fun getAllAmiibo(): AmiiboResponse
 
     @GET("amiiboseries/")
     suspend fun getAllSeries(): SeriesResponse

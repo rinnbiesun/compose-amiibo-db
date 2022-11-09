@@ -1,5 +1,7 @@
 package com.rinnbie.amiibodb.data
 
+import com.google.gson.annotations.SerializedName
+
 data class SeriesResponse(
-    val amiibo: List<Series>
+    @SerializedName("amiibo") val series: List<Series>
 )
