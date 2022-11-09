@@ -3,12 +3,13 @@ package com.rinnbie.amiibodb.ui.home
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
@@ -17,48 +18,66 @@ import com.rinnbie.amiibodb.R
 import com.rinnbie.amiibodb.data.Amiibo
 import com.rinnbie.amiibodb.ui.HomeUiState
 import com.rinnbie.amiibodb.ui.MainViewModel
+import com.rinnbie.amiibodb.ui.theme.AmiiboDBBackground
+import com.rinnbie.amiibodb.ui.theme.AmiiboDBTheme
+
+@Composable
+fun ColumnScope.SpaceFill() {
+    Spacer(modifier = Modifier.weight(1f))
+}
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel = hiltViewModel(),
+    /*viewModel: MainViewModel = hiltViewModel(),*/
 ) {
-    val homeState: HomeUiState by viewModel.homeUiState.collectAsStateWithLifecycle()
-
-    val contentPadding = WindowInsets
-        .systemBars
-        .add(WindowInsets(left = 16.dp, top = 16.dp, right = 16.dp, bottom = 16.dp))
-        .asPaddingValues()
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        item {
-            HomeHeader()
+    AmiiboDBBackground {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                HomeHeader()
+            }
+            item {
+                Box(modifier = Modifier.height(48.dp))
+            }
+            item {
+                HomeHeader()
+            }
         }
-    }
 
-    when (val uiState = homeState) {
-        HomeUiState.Loading -> {
+        /*val homeState: HomeUiState by viewModel.homeUiState.collectAsStateWithLifecycle()
 
-        }
-        HomeUiState.Error -> {
+        when (val uiState = homeState) {
+            HomeUiState.Loading -> {
 
-        }
-        is HomeUiState.Success -> {
-            AmiiboList(uiState.amiiboList)
-        }
+            }
+            HomeUiState.Error -> {
+
+            }
+            is HomeUiState.Success -> {
+                AmiiboList(uiState.amiiboList)
+            }
+        }*/
     }
 }
 
 @Composable
 private fun HomeHeader() {
     Text(
-        text = stringResource(id = R.string.app_name),
-        style = MaterialTheme.typography.h1
+        text = stringResource(id = R.string.app_name), style = MaterialTheme.typography.titleLarge
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    AmiiboDBTheme {
+        HomeScreen()
+    }
 }
 
 @Composable
