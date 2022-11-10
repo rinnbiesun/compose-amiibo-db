@@ -5,7 +5,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 
 
 val LightColors = lightColorScheme(
@@ -73,15 +72,9 @@ val DarkColors = darkColorScheme(
     scrim = md_theme_dark_scrim,
 )
 
-val LightAndroidBackgroundTheme = BackgroundTheme(colorScheme = LightColors)
-
-val DarkAndroidBackgroundTheme = BackgroundTheme(colorScheme = DarkColors)
-
-
 @Composable
 fun AmiiboDBTheme(
-    useDarkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable() () -> Unit
+    useDarkTheme: Boolean = isSystemInDarkTheme(), content: @Composable() () -> Unit
 ) {
     val colors = if (!useDarkTheme) {
         LightColors
@@ -89,18 +82,7 @@ fun AmiiboDBTheme(
         DarkColors
     }
 
-    val backgroundTheme = if (!useDarkTheme) {
-        LightAndroidBackgroundTheme
-    } else {
-        DarkAndroidBackgroundTheme
-    }
-
-    CompositionLocalProvider(
-        LocalBackgroundTheme provides backgroundTheme
-    ) {
-        MaterialTheme(
-            colorScheme = colors,
-            content = content
-        )
-    }
+    MaterialTheme(
+        colorScheme = colors, content = content
+    )
 }
