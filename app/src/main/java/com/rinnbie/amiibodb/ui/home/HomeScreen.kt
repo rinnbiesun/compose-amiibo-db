@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -16,13 +17,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.rinnbie.amiibodb.R
 import com.rinnbie.amiibodb.data.Amiibo
+import com.rinnbie.amiibodb.data.Release
+import com.rinnbie.amiibodb.data.Series
 import com.rinnbie.amiibodb.ui.HomeUiState
 import com.rinnbie.amiibodb.ui.MainViewModel
 import com.rinnbie.amiibodb.ui.components.AmiiboDBBackground
@@ -33,8 +38,7 @@ import com.rinnbie.amiibodb.ui.theme.Shapes
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier,
-    viewModel: MainViewModel = hiltViewModel()
+    modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewModel()
 ) {
     val homeState: HomeUiState by viewModel.homeUiState.collectAsStateWithLifecycle()
 
@@ -47,58 +51,7 @@ fun HomeScreen(
         }
         is HomeUiState.Success -> {
             Log.d("HomeScreen", "homeState = ${uiState.homeData}")
-            AmiiboDBTheme {
-                AmiiboDBBackground {
-                    LazyColumn(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        item {
-                            HomeHeader()
-                        }
-                        item {
-                            Row(modifier = Modifier.fillMaxWidth()) {
-                                for (i in 0 until 5) {
-                                    AmiiboCard()
-                                }
-                            }
-                        }
-                        item {
-                            HomeSearchBar()
-                        }
-                        item {
-                            HomeFullWidthButton(text = stringResource(id = R.string.all))
-                        }
-                        item {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                for (i in 0 until 3) {
-                                    HomeCircleButton()
-                                }
-                            }
-                        }
-                        item {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                for (i in 0 until 3) {
-                                    HomeCircleButton()
-                                }
-                            }
-                        }
-                        item {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                for (i in 0 until 3) {
-                                    HomeCircleButton()
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            HomeContentScreen(uiState.homeData.series)
         }
     }
 }
@@ -108,7 +61,9 @@ private fun HomeEmptyScreen() {
     AmiiboDBTheme {
         AmiiboDBBackground {
             LazyColumn(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
@@ -120,10 +75,105 @@ private fun HomeEmptyScreen() {
 }
 
 @Composable
+private fun HomeContentScreen(series: List<Series> = emptyList()) {
+    AmiiboDBTheme {
+        AmiiboDBBackground {
+            LazyColumn(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                item {
+                    HomeHeader()
+                }
+                item {
+                    HomeSearchBar()
+                }
+                item {
+                    HomeFullWidthButton(text = stringResource(id = R.string.all))
+                }
+                item {
+                    Box(modifier = Modifier.height(16.dp))
+                }
+                if (series.isEmpty()) {
+                    item {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            for (i in 0 until 3) {
+                                HomeCircleButton(
+                                    series = Series(
+                                        "0x00", "Super Smash Bros.", Amiibo(
+                                            "",
+                                            "",
+                                            "",
+                                            "",
+                                            "https://raw.githubusercontent.com/N3evin/AmiiboAPI/master/images/icon_00000000-00000002.png",
+                                            "",
+                                            Release("", "", "", ""),
+                                            "",
+                                            ""
+                                        )
+                                    )
+                                )
+                            }
+                        }
+                    }
+                    item {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            HomeCircleButton(
+                                series = Series(
+                                    "0x00", "Super Smash Bros.", Amiibo(
+                                        "",
+                                        "",
+                                        "",
+                                        "",
+                                        "https://raw.githubusercontent.com/N3evin/AmiiboAPI/master/images/icon_00000000-00000002.png",
+                                        "",
+                                        Release("", "", "", ""),
+                                        "",
+                                        ""
+                                    )
+                                )
+                            )
+                        }
+                    }
+                } else {
+                    val cols = 3
+                    items(series.chunked(cols)) { items ->
+                        Row {
+                            for ((index, item) in items.withIndex()) {
+                                HomeCircleButton(
+                                    modifier = Modifier.fillMaxWidth(1f / (cols - index)),
+                                    series = item
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun HomeHeader() {
-    Text(
-        text = stringResource(id = R.string.app_name), style = MaterialTheme.typography.titleLarge
-    )
+    Column(Modifier.padding(top = 16.dp)) {
+        Text(
+            text = stringResource(id = R.string.app_name),
+            style = MaterialTheme.typography.titleLarge
+        )
+        Box(Modifier.height(8.dp))
+        Column(
+            modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            val image: Painter = painterResource(id = R.drawable.logo_amiibo)
+            Image(painter = image, contentDescription = "")
+        }
+    }
 }
 
 @Composable
@@ -153,40 +203,37 @@ private fun HomeSearchBar() {
 }
 
 @Composable
-private fun RowScope.AmiiboCard() {
-    Box(
-        modifier = Modifier
-            .weight(1f)
-            .height(80.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        val image: Painter = painterResource(id = R.drawable.amiibo_splatoon)
-        Image(painter = image, contentDescription = "")
-    }
-}
-
-@Composable
-private fun RowScope.HomeCircleButton() {
+private fun HomeCircleButton(modifier: Modifier = Modifier, series: Series) {
     Column(
-        modifier = Modifier
-            .aspectRatio(1.0f)
-            .weight(1f),
+        modifier = modifier
+            .height(120.dp)
+            .padding(bottom = 48.dp)
+            .aspectRatio(1f),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
             modifier = Modifier
                 .aspectRatio(1.0f)
                 .weight(1f)
-                .background(
-                    MaterialTheme.colorScheme.secondaryContainer,
-                    shape = CircleShape
-                ),
+            /*.background(
+                 MaterialTheme.colorScheme.secondaryContainer, shape = CircleShape
+             )*/,
             contentAlignment = Alignment.Center
         ) {
-            val image: Painter = painterResource(id = R.drawable.amiibo_splatoon)
-            Image(modifier = Modifier.padding(8.dp), painter = image, contentDescription = "")
+            AsyncImage(
+                model = series.defaultAmiibo?.image, contentDescription = null
+            )
         }
-        Text(text = "Splatoon")
+        Box(modifier = Modifier.height(5.dp))
+        Box {
+            Text(
+                modifier = Modifier.align(Alignment.Center),
+                textAlign = TextAlign.Center,
+                text = series.name,
+                maxLines = 1,
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
     }
 }
 
@@ -199,12 +246,19 @@ private fun HomeFullWidthButton(
             .fillMaxWidth()
             .defaultMinSize(minHeight = 100.dp)
             .background(
-                MaterialTheme.colorScheme.secondaryContainer,
-                shape = Shapes.medium
-            ),
-        contentAlignment = Alignment.Center
+                MaterialTheme.colorScheme.secondaryContainer, shape = Shapes.medium
+            ), contentAlignment = Alignment.Center
     ) {
         Text(text = text, style = MaterialTheme.typography.headlineLarge)
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun HomeEmptyScreenPreview() {
+    AmiiboDBTheme {
+        HomeEmptyScreen()
     }
 }
 
@@ -212,11 +266,6 @@ private fun HomeFullWidthButton(
 @Composable
 fun DefaultPreview() {
     AmiiboDBTheme {
-        HomeScreen()
+        HomeContentScreen()
     }
-}
-
-@Composable
-private fun AmiiboList(list: List<Amiibo>) {
-    Log.d("HomeScreen", "list size = ${list.size}")
 }

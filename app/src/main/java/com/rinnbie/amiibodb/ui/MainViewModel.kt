@@ -33,10 +33,15 @@ class MainViewModel @Inject constructor(
             .map { homeResult ->
                 when (homeResult) {
                     is Result.Success -> {
+                        val allAmiibo = homeResult.data.first.amiibo
+                        val series = homeResult.data.second.series.onEach { series ->
+                            series.defaultAmiibo =
+                                allAmiibo.firstOrNull { series.name == it.amiiboSeries }
+                        }
                         HomeUiState.Success(
                             HomeData(
-                                homeResult.data.first.amiibo,
-                                homeResult.data.second.series
+                                allAmiibo,
+                                series
                             )
                         )
                     }
