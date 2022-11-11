@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -18,13 +17,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rinnbie.amiibodb.R
 import com.rinnbie.amiibodb.data.Amiibo
-import com.rinnbie.amiibodb.ui.HomeUiState
-import com.rinnbie.amiibodb.ui.MainViewModel
 import com.rinnbie.amiibodb.ui.components.AmiiboDBBackground
 import com.rinnbie.amiibodb.ui.theme.AmiiboDBTheme
 import com.rinnbie.amiibodb.ui.theme.Shapes
@@ -63,7 +58,7 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         for (i in 0 until 3) {
-                            HomeSquareButton()
+                            HomeCircleButton()
                         }
                     }
                 }
@@ -72,7 +67,7 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         for (i in 0 until 3) {
-                            HomeSquareButton()
+                            HomeCircleButton()
                         }
                     }
                 }
@@ -81,7 +76,7 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         for (i in 0 until 3) {
-                            HomeSquareButton()
+                            HomeCircleButton()
                         }
                     }
                 }
@@ -150,16 +145,29 @@ private fun RowScope.AmiiboCard() {
 }
 
 @Composable
-private fun RowScope.HomeSquareButton() {
-    Box(
+private fun RowScope.HomeCircleButton() {
+    Column(
         modifier = Modifier
             .aspectRatio(1.0f)
-            .weight(1f)
-            .background(
-                MaterialTheme.colorScheme.secondaryContainer,
-                shape = Shapes.medium
-            )
-    )
+            .weight(1f),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .aspectRatio(1.0f)
+                .weight(1f)
+                .background(
+                    MaterialTheme.colorScheme.secondaryContainer,
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            val image: Painter = painterResource(id = R.drawable.amiibo_splatoon)
+            Image(modifier = Modifier.padding(8.dp), painter = image, contentDescription = "")
+        }
+        Text(text = "Splatoon")
+    }
+
 }
 
 @Composable
