@@ -8,6 +8,7 @@ import com.rinnbie.amiibodb.data.asResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import com.rinnbie.amiibodb.data.Result
+import com.rinnbie.amiibodb.model.HomeData
 import kotlinx.coroutines.flow.*
 
 @HiltViewModel
@@ -24,18 +25,30 @@ class MainViewModel @Inject constructor(
             )
 
     private fun homeUiStateStream(amiiboRepository: AmiiboRepository): Flow<HomeUiState> {
-        return amiiboRepository.getAllAmiibo().asResult().map { homeResult ->
-            when (homeResult) {
-                is Result.Success -> HomeUiState.Success(homeResult.data.amiibo)
-                is Result.Loading -> HomeUiState.Loading
-                is Result.Error -> HomeUiState.Error
+        return combine(
+            amiiboRepository.getAllAmiibo(),
+            amiiboRepository.getAllSeries(),
+            ::Pair
+        ).asResult()
+            .map { homeResult ->
+                when (homeResult) {
+                    is Result.Success -> {
+                        HomeUiState.Success(
+                            HomeData(
+                                homeResult.data.first.amiibo,
+                                homeResult.data.second.series
+                            )
+                        )
+                    }
+                    is Result.Loading -> HomeUiState.Loading
+                    is Result.Error -> HomeUiState.Error
+                }
             }
-        }
     }
 }
 
 sealed interface HomeUiState {
-    data class Success(val amiiboList: List<Amiibo>) : HomeUiState
+    data class Success(val homeData: HomeData) : HomeUiState
     object Error : HomeUiState
     object Loading : HomeUiState
 }
