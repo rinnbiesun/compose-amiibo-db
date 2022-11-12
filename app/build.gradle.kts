@@ -86,6 +86,7 @@ dependencies {
     implementation(libs.androidx.compose.material3.windowSizeClass)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.coil.compose)
+    implementation(libs.accompanist.placeholder.material)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     // Testing dependencies

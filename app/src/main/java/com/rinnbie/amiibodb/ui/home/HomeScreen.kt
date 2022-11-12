@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -14,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -24,13 +26,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.google.accompanist.placeholder.PlaceholderHighlight
+import com.google.accompanist.placeholder.placeholder
+import com.google.accompanist.placeholder.shimmer
 import com.rinnbie.amiibodb.R
-import com.rinnbie.amiibodb.data.Amiibo
-import com.rinnbie.amiibodb.data.Release
 import com.rinnbie.amiibodb.data.Series
 import com.rinnbie.amiibodb.ui.HomeUiState
 import com.rinnbie.amiibodb.ui.MainViewModel
-import com.rinnbie.amiibodb.ui.components.AmiiboDBBackground
 import com.rinnbie.amiibodb.ui.theme.AmiiboDBTheme
 import com.rinnbie.amiibodb.ui.theme.Shapes
 
@@ -44,7 +46,7 @@ fun HomeScreen(
 
     when (val uiState = homeState) {
         HomeUiState.Loading -> {
-            HomeEmptyScreen()
+            HomeLoadingScreen()
         }
         HomeUiState.Error -> {
             HomeEmptyScreen()
@@ -58,16 +60,18 @@ fun HomeScreen(
 
 @Composable
 private fun HomeEmptyScreen() {
-    AmiiboDBTheme {
-        AmiiboDBBackground {
-            LazyColumn(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                item {
-                    HomeHeader()
+    HomeContainer {}
+}
+
+@Composable
+private fun HomeLoadingScreen() {
+    HomeContainer {
+        item {
+            for (i in 0 until 3) {
+                Row {
+                    for (i in 0 until 3) {
+                        SeriesPlaceholder(modifier = Modifier.fillMaxWidth(1f / (3 - i)))
+                    }
                 }
             }
         }
@@ -76,85 +80,42 @@ private fun HomeEmptyScreen() {
 
 @Composable
 private fun HomeContentScreen(series: List<Series> = emptyList()) {
-    AmiiboDBTheme {
-        AmiiboDBBackground {
-            LazyColumn(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                item {
-                    HomeHeader()
-                }
-                item {
-                    HomeSearchBar()
-                }
-                item {
-                    HomeFullWidthButton(text = stringResource(id = R.string.all))
-                }
-                item {
-                    Box(modifier = Modifier.height(16.dp))
-                }
-                if (series.isEmpty()) {
-                    item {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            for (i in 0 until 3) {
-                                HomeCircleButton(
-                                    series = Series(
-                                        "0x00", "Super Smash Bros.", Amiibo(
-                                            "",
-                                            "",
-                                            "",
-                                            "",
-                                            "https://raw.githubusercontent.com/N3evin/AmiiboAPI/master/images/icon_00000000-00000002.png",
-                                            "",
-                                            Release("", "", "", ""),
-                                            "",
-                                            ""
-                                        )
-                                    )
-                                )
-                            }
-                        }
-                    }
-                    item {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            HomeCircleButton(
-                                series = Series(
-                                    "0x00", "Super Smash Bros.", Amiibo(
-                                        "",
-                                        "",
-                                        "",
-                                        "",
-                                        "https://raw.githubusercontent.com/N3evin/AmiiboAPI/master/images/icon_00000000-00000002.png",
-                                        "",
-                                        Release("", "", "", ""),
-                                        "",
-                                        ""
-                                    )
-                                )
-                            )
-                        }
-                    }
-                } else {
-                    val cols = 3
-                    items(series.chunked(cols)) { items ->
-                        Row {
-                            for ((index, item) in items.withIndex()) {
-                                HomeCircleButton(
-                                    modifier = Modifier.fillMaxWidth(1f / (cols - index)),
-                                    series = item
-                                )
-                            }
-                        }
+    HomeContainer {
+        if (series.isNotEmpty()) {
+            val cols = 3
+            items(series.chunked(cols)) { items ->
+                Row {
+                    for ((index, item) in items.withIndex()) {
+                        SeriesButton(
+                            modifier = Modifier.fillMaxWidth(1f / (cols - index)), series = item
+                        )
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun HomeContainer(modifier: Modifier = Modifier, content: LazyListScope.() -> Unit) {
+    LazyColumn(
+        modifier = modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        item {
+            HomeHeader()
+        }
+        item {
+            HomeSearchBar()
+        }
+        item {
+            AllAmiiboButton(text = stringResource(id = R.string.all))
+        }
+        content()
+        item {
+            Box(modifier = Modifier.height(48.dp))
         }
     }
 }
@@ -203,11 +164,27 @@ private fun HomeSearchBar() {
 }
 
 @Composable
-private fun HomeCircleButton(modifier: Modifier = Modifier, series: Series) {
+private fun SeriesPlaceholder(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .height(120.dp)
-            .padding(bottom = 48.dp)
+            .padding(horizontal = 8.dp)
+            .aspectRatio(1f)
+            .placeholder(
+                visible = true,
+                color = Color.Gray.copy(0.2f),
+                shape = Shapes.small,
+                highlight = PlaceholderHighlight.shimmer(highlightColor = Color.White)
+            ), horizontalAlignment = Alignment.CenterHorizontally
+    ) {}
+}
+
+@Composable
+private fun SeriesButton(modifier: Modifier = Modifier, series: Series) {
+    Column(
+        modifier = modifier
+            .height(120.dp)
+            .padding(horizontal = 8.dp)
             .aspectRatio(1f),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -217,11 +194,11 @@ private fun HomeCircleButton(modifier: Modifier = Modifier, series: Series) {
                 .weight(1f)
             /*.background(
                  MaterialTheme.colorScheme.secondaryContainer, shape = CircleShape
-             )*/,
-            contentAlignment = Alignment.Center
+             )*/, contentAlignment = Alignment.Center
         ) {
             AsyncImage(
-                model = series.defaultAmiibo?.image, contentDescription = null
+                model = series.defaultAmiibo?.image,
+                contentDescription = null,
             )
         }
         Box(modifier = Modifier.height(5.dp))
@@ -238,7 +215,7 @@ private fun HomeCircleButton(modifier: Modifier = Modifier, series: Series) {
 }
 
 @Composable
-private fun HomeFullWidthButton(
+private fun AllAmiiboButton(
     text: String = ""
 ) {
     Box(
