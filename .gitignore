@@ -180,3 +180,5 @@ lint/tmp/
 # Android Profiling
 *.hprof
 
+node_modules
+.prettierignore
