@@ -182,3 +182,4 @@ lint/tmp/
 
 node_modules
 .prettierignore
+app/release
