@@ -16,6 +16,45 @@
 default_platform(:android)
 
 platform :android do
+  desc "Create a new release on GitHub and upload assets"
+  lane :github_release do
+    gradle(task: "clean")
+    gradle(
+      task: "assemble",
+      build_type: "Release",
+      properties: {
+        "android.injected.signing.store.file" => "",
+        "android.injected.signing.store.password" => "",
+        "android.injected.signing.key.alias" => "",
+        "android.injected.signing.key.password" => "",
+      },
+    )
+    version_name =
+      "v#{android_get_version_name(gradle_file: "app/build.gradle.kts")}"
+
+    puts("version name: #{version_name}")
+
+    add_git_tag(tag: version_name)
+    push_git_tags
+
+    set_github_release(
+      repository_name: "rinnbiesun/compose-amiibo-db",
+      api_token: "",
+      name: version_name,
+      tag_name: version_name,
+      description:
+        (
+          begin
+            File.read("changelog")
+          rescue StandardError
+            "No changelog provided"
+          end
+        ),
+      commitish: "main",
+      upload_assets: lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH],
+    )
+  end
+
   desc "Runs all the tests"
   lane :test do
     gradle(task: "test")
@@ -25,7 +64,7 @@ platform :android do
   lane :beta do
     gradle(task: "clean assembleRelease")
     crashlytics
-  
+
     # sh "your_script.sh"
     # You can also use other beta testing services here
   end
