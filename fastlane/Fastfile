@@ -23,10 +23,10 @@ platform :android do
       task: "assemble",
       build_type: "Release",
       properties: {
-        "android.injected.signing.store.file" => "",
-        "android.injected.signing.store.password" => "",
-        "android.injected.signing.key.alias" => "",
-        "android.injected.signing.key.password" => "",
+        "android.injected.signing.store.file" => "/home/runner/work/compose-amiibo-db/compose-amiibo-db/app/keystore.jks",
+        "android.injected.signing.store.password" => ENV['ANDROID_KEY_PASSWORD'],
+        "android.injected.signing.key.alias" => ENV['ANDROID_KEY_ALIAS'],
+        "android.injected.signing.key.password" => ENV['ANDROID_STORE_PASSWORD'],
       },
     )
     version_name =
