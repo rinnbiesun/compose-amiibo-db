@@ -23,10 +23,13 @@ platform :android do
       task: "assemble",
       build_type: "Release",
       properties: {
-        "android.injected.signing.store.file" => "/home/runner/work/compose-amiibo-db/compose-amiibo-db/app/keystore.jks",
-        "android.injected.signing.store.password" => ENV['ANDROID_KEY_PASSWORD'],
-        "android.injected.signing.key.alias" => ENV['ANDROID_KEY_ALIAS'],
-        "android.injected.signing.key.password" => ENV['ANDROID_STORE_PASSWORD'],
+        "android.injected.signing.store.file" =>
+          "/home/runner/work/compose-amiibo-db/compose-amiibo-db/app/keystore.jks",
+        "android.injected.signing.store.password" =>
+          ENV["ANDROID_KEY_PASSWORD"],
+        "android.injected.signing.key.alias" => ENV["ANDROID_KEY_ALIAS"],
+        "android.injected.signing.key.password" =>
+          ENV["ANDROID_STORE_PASSWORD"],
       },
     )
     version_name =
@@ -39,7 +42,7 @@ platform :android do
 
     set_github_release(
       repository_name: "rinnbiesun/compose-amiibo-db",
-      api_token: "",
+      api_token: ENV["ANDROID_GITHUB_TOKEN"],
       name: version_name,
       tag_name: version_name,
       description:

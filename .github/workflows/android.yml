@@ -17,6 +17,7 @@ jobs:
       ANDROID_SIGNING_KEY: ${{secrets.ANDROID_SIGNING_KEY}}
       ANDROID_SIGNING_KEY_PASSPHRASE: ${{secrets.ANDROID_SIGNING_KEY_PASSPHRASE}}
       ANDROID_STORE_PASSWORD: ${{secrets.ANDROID_STORE_PASSWORD}}
+      ANDROID_GITHUB_TOKEN: ${{secrets.ANDROID_GITHUB_TOKEN}}
 
     steps:
       - name: Checkout repository
