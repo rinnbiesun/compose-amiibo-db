@@ -1,8 +1,7 @@
-package com.rinnbie.amiibodb.ui
+package com.rinnbie.amiibodb.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rinnbie.amiibodb.data.Amiibo
 import com.rinnbie.amiibodb.repository.AmiiboRepository
 import com.rinnbie.amiibodb.data.asResult
 import dagger.hilt.android.lifecycle.HiltViewModel
