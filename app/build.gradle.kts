@@ -71,6 +71,9 @@ dependencies {
     implementation(libs.okhttp3.logging.interceptor)
     implementation(libs.retrofit2.converter.gson)
     implementation(libs.retrofit2)
+    implementation(libs.androidx.room.runtime)
+    kapt(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
 
     // Compose
     implementation(libs.androidx.activity.compose)

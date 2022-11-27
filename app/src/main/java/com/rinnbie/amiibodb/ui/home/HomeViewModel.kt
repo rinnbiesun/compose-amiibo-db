@@ -2,17 +2,17 @@ package com.rinnbie.amiibodb.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rinnbie.amiibodb.repository.AmiiboRepository
 import com.rinnbie.amiibodb.data.asResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import com.rinnbie.amiibodb.data.Result
+import com.rinnbie.amiibodb.data.source.AmiiboRepository
 import com.rinnbie.amiibodb.model.HomeData
 import kotlinx.coroutines.flow.*
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    amiiboRepository: AmiiboRepository
+    val amiiboRepository: AmiiboRepository
 ) : ViewModel() {
 
     val homeUiState: StateFlow<HomeUiState> =
@@ -25,15 +25,15 @@ class MainViewModel @Inject constructor(
 
     private fun homeUiStateStream(amiiboRepository: AmiiboRepository): Flow<HomeUiState> {
         return combine(
-            amiiboRepository.getAllAmiibo(),
+            amiiboRepository.getAllAmiibos(),
             amiiboRepository.getAllSeries(),
             ::Pair
         ).asResult()
             .map { homeResult ->
                 when (homeResult) {
                     is Result.Success -> {
-                        val allAmiibo = homeResult.data.first.amiibo
-                        val series = homeResult.data.second.series.onEach { series ->
+                        val allAmiibo = homeResult.data.first
+                        val series = homeResult.data.second.onEach { series ->
                             series.defaultAmiibo =
                                 allAmiibo.firstOrNull { series.name == it.amiiboSeries }
                         }
