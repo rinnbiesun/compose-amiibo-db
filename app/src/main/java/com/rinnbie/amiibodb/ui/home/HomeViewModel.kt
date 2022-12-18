@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.*
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    val amiiboRepository: AmiiboRepository
+    amiiboRepository: AmiiboRepository
 ) : ViewModel() {
 
     val homeUiState: StateFlow<HomeUiState> =
@@ -25,17 +25,20 @@ class MainViewModel @Inject constructor(
 
     private fun homeUiStateStream(amiiboRepository: AmiiboRepository): Flow<HomeUiState> {
         return combine(
-            amiiboRepository.getAllAmiibos(),
-            amiiboRepository.getAllSeries(),
+            amiiboRepository.getAllAmiibos(forceUpdate = true),
+            amiiboRepository.getAllSeries(forceUpdate = true),
             ::Pair
         ).asResult()
             .map { homeResult ->
                 when (homeResult) {
                     is Result.Success -> {
-                        val allAmiibo = homeResult.data.first
+                        val allAmiibo = homeResult.data.first.onEach {
+                            amiiboRepository.saveAmiibo(it)
+                        }
                         val series = homeResult.data.second.onEach { series ->
                             series.defaultAmiibo =
                                 allAmiibo.firstOrNull { series.name == it.amiiboSeries }
+                            amiiboRepository.saveSeries(series)
                         }
                         HomeUiState.Success(
                             HomeData(

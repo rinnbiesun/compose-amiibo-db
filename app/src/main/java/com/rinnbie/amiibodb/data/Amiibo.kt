@@ -5,14 +5,14 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Amiibo(
-    @PrimaryKey val id: String,
-    val amiiboSeries: String,
-    val character: String,
-    val gameSeries: String,
-    val head: String,
-    val image: String,
-    val name: String,
-    val release: Release,
-    val tail: String,
-    val type: String
+    @PrimaryKey var id: String,
+    val amiiboSeries: String? = null,
+    val character: String? = null,
+    val gameSeries: String? = null,
+    val head: String? = null,
+    val image: String? = null,
+    val name: String? = null,
+    val release: Release? = null,
+    val tail: String? = null,
+    val type: String? = null,
 )

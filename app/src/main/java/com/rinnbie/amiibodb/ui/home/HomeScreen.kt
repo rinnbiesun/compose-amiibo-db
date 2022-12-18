@@ -39,14 +39,23 @@ import com.rinnbie.amiibodb.ui.theme.Shapes
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
-fun HomeScreen(
+fun HomeRoute(
     modifier: Modifier = Modifier,
     onNavigateToList: () -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val homeState: HomeUiState by viewModel.homeUiState.collectAsStateWithLifecycle()
 
-    when (val uiState = homeState) {
+    HomeScreen(modifier = modifier, homeState = homeState, onNavigateToList = onNavigateToList)
+}
+
+@Composable
+internal fun HomeScreen(
+    modifier: Modifier = Modifier,
+    homeState: HomeUiState,
+    onNavigateToList: () -> Unit
+) {
+    when (homeState) {
         HomeUiState.Loading -> {
             HomeLoadingScreen()
         }
@@ -54,10 +63,10 @@ fun HomeScreen(
             HomeEmptyScreen()
         }
         is HomeUiState.Success -> {
-            Log.d("HomeScreen", "homeState = ${uiState.homeData}")
+            Log.d("HomeScreen", "homeState = ${homeState.homeData}")
             HomeContentScreen(
                 modifier,
-                uiState.homeData,
+                homeState.homeData,
                 onNavigateToList = onNavigateToList
             )
         }
@@ -66,12 +75,12 @@ fun HomeScreen(
 
 @Composable
 private fun HomeEmptyScreen() {
-    HomeContainer {}
+    HomeBody {}
 }
 
 @Composable
 private fun HomeLoadingScreen() {
-    HomeContainer {
+    HomeBody {
         item {
             for (i in 0 until 12) {
                 Row {
@@ -90,7 +99,7 @@ private fun HomeContentScreen(
     homeData: HomeData = HomeData(),
     onNavigateToList: () -> Unit = {},
 ) {
-    HomeContainer(
+    HomeBody(
         onNavigateToList = onNavigateToList
     ) {
         if (homeData.series.isNotEmpty()) {
@@ -108,52 +117,53 @@ private fun HomeContentScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun HomeContainer(
+private fun HomeBody(
     modifier: Modifier = Modifier,
     onNavigateToList: () -> Unit = {},
     content: LazyListScope.() -> Unit
 ) {
-    LazyColumn(
-        modifier = modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        item {
-            HomeHeader()
-        }
-        item {
-            HomeSearchBar()
-        }
-        item {
-            AllAmiiboButton(
-                text = stringResource(id = R.string.all), onNavigateToList = onNavigateToList
-            )
-        }
-        content()
-        item {
-            Box(modifier = Modifier.height(48.dp))
+    Column {
+        TopAppBar(
+            title = {
+                Text(text = stringResource(id = R.string.app_name))
+            }
+        )
+        LazyColumn(
+            modifier = modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                HomeHeader()
+            }
+            item {
+                HomeSearchBar()
+            }
+            item {
+                AllAmiiboButton(
+                    text = stringResource(id = R.string.all), onNavigateToList = onNavigateToList
+                )
+            }
+            content()
+            item {
+                Box(modifier = Modifier.height(48.dp))
+            }
         }
     }
 }
 
 @Composable
 private fun HomeHeader() {
-    Column(Modifier.padding(top = 16.dp)) {
-        Text(
-            text = stringResource(id = R.string.app_name),
-            style = MaterialTheme.typography.titleLarge
+    Column(
+        modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        val image: Painter = painterResource(id = R.drawable.logo_amiibo)
+        Image(
+            modifier = Modifier.fillMaxSize(0.4f), painter = image, contentDescription = ""
         )
-        Box(Modifier.height(8.dp))
-        Column(
-            modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            val image: Painter = painterResource(id = R.drawable.logo_amiibo)
-            Image(
-                modifier = Modifier.fillMaxSize(0.4f), painter = image, contentDescription = ""
-            )
-        }
     }
 }
 
@@ -252,14 +262,6 @@ private fun AllAmiiboButton(
     }
 }
 
-
-@Preview(showBackground = true)
-@Composable
-fun HomeEmptyScreenPreview() {
-    AmiiboDBTheme {
-        HomeEmptyScreen()
-    }
-}
 
 @Preview(showBackground = true)
 @Composable

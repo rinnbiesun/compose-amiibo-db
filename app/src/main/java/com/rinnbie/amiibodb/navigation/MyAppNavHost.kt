@@ -6,8 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.rinnbie.amiibodb.ui.amiibo.AmiiboListScreen
-import com.rinnbie.amiibodb.ui.home.HomeScreen
+import com.rinnbie.amiibodb.ui.amiibo.AmiiboListRoute
+import com.rinnbie.amiibodb.ui.home.HomeRoute
 
 @Composable
 fun MyAppNavHost(
@@ -19,13 +19,16 @@ fun MyAppNavHost(
         modifier = modifier, navController = navController, startDestination = startDestination
     ) {
         composable("home") {
-            HomeScreen(onNavigateToList = {
+            HomeRoute(onNavigateToList = {
                 navController.navigate("all_amiibos")
             })
         }
         composable("all_amiibos") {
-            AmiiboListScreen(
-                modifier = modifier
+            AmiiboListRoute(
+                modifier = modifier,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
             )
         }
     }
