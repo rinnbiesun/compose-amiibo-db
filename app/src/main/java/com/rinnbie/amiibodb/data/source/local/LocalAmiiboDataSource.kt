@@ -18,18 +18,19 @@ class LocalAmiiboDataSource @Inject constructor(private val amiiboDao: AmiiboDao
     }
 
     override suspend fun saveAmiibo(amiibo: Amiibo) {
-        TODO("Not yet implemented")
+        amiibo.id = amiibo.head + amiibo.tail
+        amiiboDao.insertAmiibo(amiibo)
     }
 
     override suspend fun saveSeries(series: Series) {
-        TODO("Not yet implemented")
+        amiiboDao.insertSeries(series)
     }
 
     override suspend fun deleteAllAmiibos() {
-        TODO("Not yet implemented")
+        amiiboDao.deleteAllAmiibos()
     }
 
     override suspend fun deleteAllSeries() {
-        TODO("Not yet implemented")
+        amiiboDao.deleteAllSeries()
     }
 }

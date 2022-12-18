@@ -5,8 +5,8 @@ import com.rinnbie.amiibodb.data.Series
 import kotlinx.coroutines.flow.Flow
 
 interface AmiiboRepository {
-    fun getAllAmiibos(): Flow<List<Amiibo>>
-    fun getAllSeries(): Flow<List<Series>>
+    fun getAllAmiibos(forceUpdate: Boolean): Flow<List<Amiibo>>
+    fun getAllSeries(forceUpdate: Boolean): Flow<List<Series>>
     suspend fun saveAmiibo(amiibo: Amiibo)
     suspend fun saveSeries(series: Series)
     suspend fun deleteAllAmiibos()

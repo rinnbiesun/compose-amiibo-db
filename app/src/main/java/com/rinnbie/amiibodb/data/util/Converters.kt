@@ -12,5 +12,4 @@ class AmiiboReleaseConverter {
     @TypeConverter
     fun stringToAmiiboRelease(value: String): Release =
         Gson().fromJson(value, Release::class.java)
-
 }

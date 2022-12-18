@@ -10,28 +10,34 @@ import javax.inject.Inject
 class DefaultAmiiboRepository @Inject constructor(
     val remoteDataSource: RemoteAmiiboDataSource,
     val localDataSource: LocalAmiiboDataSource
-): AmiiboRepository {
-    override fun getAllAmiibos(): Flow<List<Amiibo>> {
-        return remoteDataSource.getAllAmiibos()
+) : AmiiboRepository {
+    override fun getAllAmiibos(forceUpdate: Boolean): Flow<List<Amiibo>> {
+        if (forceUpdate) {
+            return remoteDataSource.getAllAmiibos()
+        }
+        return localDataSource.getAllAmiibos()
     }
 
-    override fun getAllSeries(): Flow<List<Series>> {
-        return remoteDataSource.getAllSeries()
+    override fun getAllSeries(forceUpdate: Boolean): Flow<List<Series>> {
+        if (forceUpdate) {
+            return remoteDataSource.getAllSeries()
+        }
+        return localDataSource.getAllSeries()
     }
 
     override suspend fun saveAmiibo(amiibo: Amiibo) {
-        TODO("Not yet implemented")
+        localDataSource.saveAmiibo(amiibo)
     }
 
     override suspend fun saveSeries(series: Series) {
-        TODO("Not yet implemented")
+        localDataSource.saveSeries(series)
     }
 
     override suspend fun deleteAllAmiibos() {
-        TODO("Not yet implemented")
+        localDataSource.deleteAllAmiibos()
     }
 
     override suspend fun deleteAllSeries() {
-        TODO("Not yet implemented")
+        localDataSource.deleteAllSeries()
     }
 }

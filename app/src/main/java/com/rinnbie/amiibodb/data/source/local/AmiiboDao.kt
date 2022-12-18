@@ -23,4 +23,9 @@ interface AmiiboDao {
     @Query("SELECT * FROM Series")
     fun getSeries(): Flow<List<Series>>
 
+    @Query("DELETE FROM Amiibo")
+    fun deleteAllAmiibos()
+
+    @Query("DELETE FROM Series")
+    fun deleteAllSeries()
 }

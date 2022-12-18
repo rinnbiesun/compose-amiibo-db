@@ -24,18 +24,18 @@ class RemoteAmiiboDataSource @Inject constructor(private val service: AmiiboServ
     }
 
     override suspend fun saveAmiibo(amiibo: Amiibo) {
-        TODO("Not yet implemented")
+
     }
 
     override suspend fun saveSeries(series: Series) {
-        TODO("Not yet implemented")
+
     }
 
     override suspend fun deleteAllAmiibos() {
-        TODO("Not yet implemented")
+
     }
 
     override suspend fun deleteAllSeries() {
-        TODO("Not yet implemented")
+
     }
 }
