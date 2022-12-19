@@ -1,6 +1,8 @@
 package com.rinnbie.amiibodb.ui.amiibo
 
+import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -12,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,7 +24,6 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.palette.graphics.Palette
 import coil.ImageLoader
-import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.request.SuccessResult
@@ -111,6 +113,7 @@ fun AmiiboItem(
     )
 
     var paletteColor by remember { mutableStateOf(Color.White.value.toInt()) }
+    var bitmapImage by remember { mutableStateOf<Bitmap?>(null) }
 
     LaunchedEffect(key1 = imagePainter) {
         launch {
@@ -119,8 +122,8 @@ fun AmiiboItem(
             val vibrant = Palette.from(bitmap)
                 .generate()
                 .getVibrantColor(Color.White.value.toInt())
-
             paletteColor = vibrant
+            bitmapImage = bitmap
         }
     }
 
@@ -132,11 +135,13 @@ fun AmiiboItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        AsyncImage(
-            modifier = Modifier.padding(10.dp),
-            model = amiibo.image,
-            contentDescription = null
-        )
+        bitmapImage?.asImageBitmap()?.let { image ->
+            Image(
+                modifier = Modifier.padding(10.dp),
+                bitmap = image,
+                contentDescription = null
+            )
+        }
     }
 }
 
