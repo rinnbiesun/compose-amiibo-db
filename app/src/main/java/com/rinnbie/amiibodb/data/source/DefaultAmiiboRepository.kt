@@ -11,11 +11,14 @@ class DefaultAmiiboRepository @Inject constructor(
     val remoteDataSource: RemoteAmiiboDataSource,
     val localDataSource: LocalAmiiboDataSource
 ) : AmiiboRepository {
-    override fun getAllAmiibos(forceUpdate: Boolean): Flow<List<Amiibo>> {
-        if (forceUpdate) {
-            return remoteDataSource.getAllAmiibos()
+    override fun getAllAmiibos(forceUpdate: Boolean, seriesName: String): Flow<List<Amiibo>> {
+        if (seriesName == "all") {
+            if (forceUpdate) {
+                return remoteDataSource.getAllAmiibos()
+            }
+            return localDataSource.getAllAmiibos()
         }
-        return localDataSource.getAllAmiibos()
+        return localDataSource.getAmiibosBySeries(seriesName)
     }
 
     override fun getAllSeries(forceUpdate: Boolean): Flow<List<Series>> {

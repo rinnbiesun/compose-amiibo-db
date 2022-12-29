@@ -41,7 +41,7 @@ import com.rinnbie.amiibodb.ui.theme.Shapes
 @Composable
 fun HomeRoute(
     modifier: Modifier = Modifier,
-    onNavigateToList: () -> Unit,
+    onNavigateToList: (String) -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val homeState: HomeUiState by viewModel.homeUiState.collectAsStateWithLifecycle()
@@ -53,17 +53,19 @@ fun HomeRoute(
 internal fun HomeScreen(
     modifier: Modifier = Modifier,
     homeState: HomeUiState,
-    onNavigateToList: () -> Unit
+    onNavigateToList: (String) -> Unit,
 ) {
     when (homeState) {
         HomeUiState.Loading -> {
+            Log.d("HomeScreen", "HomeUiState.Loading")
             HomeLoadingScreen()
         }
         HomeUiState.Error -> {
+            Log.d("HomeScreen", "HomeUiState.Error")
             HomeEmptyScreen()
         }
         is HomeUiState.Success -> {
-            Log.d("HomeScreen", "homeState = ${homeState.homeData}")
+            Log.d("HomeScreen", "HomeUiState.Success")
             HomeContentScreen(
                 modifier,
                 homeState.homeData,
@@ -97,7 +99,7 @@ private fun HomeLoadingScreen() {
 private fun HomeContentScreen(
     modifier: Modifier = Modifier,
     homeData: HomeData = HomeData(),
-    onNavigateToList: () -> Unit = {},
+    onNavigateToList: (String) -> Unit = {},
 ) {
     HomeBody(
         onNavigateToList = onNavigateToList
@@ -108,7 +110,8 @@ private fun HomeContentScreen(
                 Row {
                     for ((index, item) in items.withIndex()) {
                         SeriesButton(
-                            modifier = modifier.fillMaxWidth(1f / (cols - index)), series = item
+                            modifier = modifier.fillMaxWidth(1f / (cols - index)), series = item,
+                            onNavigateToList = onNavigateToList
                         )
                     }
                 }
@@ -121,7 +124,7 @@ private fun HomeContentScreen(
 @Composable
 private fun HomeBody(
     modifier: Modifier = Modifier,
-    onNavigateToList: () -> Unit = {},
+    onNavigateToList: (String) -> Unit = {},
     content: LazyListScope.() -> Unit
 ) {
     Column {
@@ -210,12 +213,17 @@ private fun SeriesPlaceholder(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun SeriesButton(modifier: Modifier = Modifier, series: Series) {
+private fun SeriesButton(
+    modifier: Modifier = Modifier,
+    series: Series,
+    onNavigateToList: (String) -> Unit
+) {
     Column(
         modifier = modifier
             .height(120.dp)
             .padding(horizontal = 8.dp)
-            .aspectRatio(1f),
+            .aspectRatio(1f)
+            .clickable { onNavigateToList(series.name) },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
@@ -247,7 +255,7 @@ private fun SeriesButton(modifier: Modifier = Modifier, series: Series) {
 @Composable
 private fun AllAmiiboButton(
     text: String = "",
-    onNavigateToList: () -> Unit
+    onNavigateToList: (String) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -256,7 +264,7 @@ private fun AllAmiiboButton(
             .background(
                 MaterialTheme.colorScheme.secondaryContainer, shape = Shapes.medium
             )
-            .clickable { onNavigateToList() }, contentAlignment = Alignment.Center
+            .clickable { onNavigateToList("all") }, contentAlignment = Alignment.Center
     ) {
         Text(text = text, style = MaterialTheme.typography.headlineLarge)
     }

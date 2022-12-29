@@ -23,6 +23,10 @@ class RemoteAmiiboDataSource @Inject constructor(private val service: AmiiboServ
         }
     }
 
+    override fun getAmiibosBySeries(seriesName: String): Flow<List<Amiibo>> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun saveAmiibo(amiibo: Amiibo) {
 
     }

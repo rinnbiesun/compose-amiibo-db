@@ -1,5 +1,6 @@
 package com.rinnbie.amiibodb.ui.amiibo
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rinnbie.amiibodb.data.Amiibo
@@ -12,11 +13,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AmiiboListViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     amiiboRepository: AmiiboRepository
 ) : ViewModel() {
 
+    private val seriesKey: String = checkNotNull(savedStateHandle["seriesArg"])
+
     val amiiboListUiState: StateFlow<AmiiboListUiState> =
-        amiiboListStateStream(amiiboRepository)
+        amiiboListStateStream(seriesKey, amiiboRepository)
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
@@ -24,8 +28,11 @@ class AmiiboListViewModel @Inject constructor(
             )
 
 
-    private fun amiiboListStateStream(amiiboRepository: AmiiboRepository): Flow<AmiiboListUiState> {
-        return amiiboRepository.getAllAmiibos(forceUpdate = false)
+    private fun amiiboListStateStream(
+        seriesName: String,
+        amiiboRepository: AmiiboRepository
+    ): Flow<AmiiboListUiState> {
+        return amiiboRepository.getAllAmiibos(forceUpdate = false, seriesName)
             .asResult()
             .map { listResult ->
                 when (listResult) {

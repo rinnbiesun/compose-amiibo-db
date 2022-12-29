@@ -2,6 +2,7 @@ package com.rinnbie.amiibodb.ui.amiibo
 
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -35,6 +36,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalLifecycleComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AmiiboListRoute(
+    title: String? = null,
     modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit,
     viewModel: AmiiboListViewModel = hiltViewModel()
@@ -44,7 +46,7 @@ fun AmiiboListRoute(
     Column {
         CenterAlignedTopAppBar(
             title = {
-                Text(text = stringResource(id = R.string.all))
+                Text(text = if (title.isNullOrEmpty()) stringResource(id = R.string.all) else title)
             },
             navigationIcon = {
                 IconButton(onClick = { onNavigateBack() }) {
@@ -63,10 +65,13 @@ internal fun AmiiboListScreen(
 ) {
     when (amiiboListUiState) {
         AmiiboListUiState.Loading -> {
+            Log.d("AmiiboListScreen", "HomeUiState.Loading")
         }
         AmiiboListUiState.Error -> {
+            Log.d("AmiiboListScreen", "HomeUiState.Error")
         }
         is AmiiboListUiState.Success -> {
+            Log.d("AmiiboListScreen", "HomeUiState.Success")
             ListBody(
                 modifier = modifier,
                 amiibos = amiiboListUiState.amiibos
