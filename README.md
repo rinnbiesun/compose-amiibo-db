@@ -3,6 +3,26 @@ Amiibo database using Jetpack Compose
 
 :warning: This project is still under development and thus some pages are not finished.
 
+## My Tasks
+### Todo
+
+- [ ] Search feature
+- [ ] Amiibo Details Page
+- [ ] Add Amiibo to Favorite
+- [ ] Testing Glide image loading library
+
+### In Progress
+
+- [ ] Auto sync the remote data
+
+### Done ✓
+
+- [x] Home Page
+- [x] Amiibo List Page
+- [x] Offline data source
+- [x] CI/CD pipeline with GitHub Actions
+
+
 ## Screenshot
 | Page  | Screenshot |
 | ------------- | ------------- |
