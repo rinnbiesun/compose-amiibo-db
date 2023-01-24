@@ -4,28 +4,46 @@ import com.rinnbie.amiibodb.data.Amiibo
 import com.rinnbie.amiibodb.data.Series
 import com.rinnbie.amiibodb.data.source.local.LocalAmiiboDataSource
 import com.rinnbie.amiibodb.data.source.remote.RemoteAmiiboDataSource
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 class DefaultAmiiboRepository @Inject constructor(
-    val remoteDataSource: RemoteAmiiboDataSource,
-    val localDataSource: LocalAmiiboDataSource
+    private val remoteDataSource: RemoteAmiiboDataSource,
+    private val localDataSource: LocalAmiiboDataSource
 ) : AmiiboRepository {
     override fun getAllAmiibos(forceUpdate: Boolean, seriesName: String): Flow<List<Amiibo>> {
         if (seriesName == "all") {
             if (forceUpdate) {
-                return remoteDataSource.getAllAmiibos()
+                return getRemoteAllAmiibos()
             }
-            return localDataSource.getAllAmiibos()
+            return localDataSource.getAllAmiibos().flatMapConcat {
+                if (it.isEmpty()) {
+                    return@flatMapConcat getRemoteAllAmiibos()
+                }
+                return@flatMapConcat flow { emit(it) }
+            }
         }
         return localDataSource.getAmiibosBySeries(seriesName)
     }
 
     override fun getAllSeries(forceUpdate: Boolean): Flow<List<Series>> {
-        if (forceUpdate) {
-            return remoteDataSource.getAllSeries()
+        if (forceUpdate) return getRemoteAllSeries()
+        return localDataSource.getAllSeries().flatMapConcat {
+            if (it.isEmpty()) {
+                return@flatMapConcat getRemoteAllSeries()
+            }
+            return@flatMapConcat flow { emit(it) }
         }
-        return localDataSource.getAllSeries()
+    }
+
+    private fun getRemoteAllAmiibos() = remoteDataSource.getAllAmiibos().map { amiibos ->
+        amiibos.onEach { amiibo -> localDataSource.saveAmiibo(amiibo) }
+    }
+
+    private fun getRemoteAllSeries() = remoteDataSource.getAllSeries().map { series ->
+        series.onEach { series ->
+            localDataSource.saveSeries(series)
+        }
     }
 
     override suspend fun saveAmiibo(amiibo: Amiibo) {

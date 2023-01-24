@@ -32,7 +32,7 @@ class AmiiboListViewModel @Inject constructor(
         seriesName: String,
         amiiboRepository: AmiiboRepository
     ): Flow<AmiiboListUiState> {
-        return amiiboRepository.getAllAmiibos(forceUpdate = false, seriesName)
+        return amiiboRepository.getAllAmiibos(seriesName = seriesName)
             .asResult()
             .map { listResult ->
                 when (listResult) {

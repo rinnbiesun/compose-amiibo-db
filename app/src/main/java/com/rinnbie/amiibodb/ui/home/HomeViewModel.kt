@@ -25,20 +25,17 @@ class MainViewModel @Inject constructor(
 
     private fun homeUiStateStream(amiiboRepository: AmiiboRepository): Flow<HomeUiState> {
         return combine(
-            amiiboRepository.getAllAmiibos(forceUpdate = true),
-            amiiboRepository.getAllSeries(forceUpdate = true),
+            amiiboRepository.getAllAmiibos(),
+            amiiboRepository.getAllSeries(),
             ::Pair
         ).asResult()
             .map { homeResult ->
                 when (homeResult) {
                     is Result.Success -> {
-                        val allAmiibo = homeResult.data.first.onEach {
-                            amiiboRepository.saveAmiibo(it)
-                        }
+                        val allAmiibo = homeResult.data.first
                         val series = homeResult.data.second.onEach { series ->
                             series.defaultAmiibo =
                                 allAmiibo.firstOrNull { series.name == it.amiiboSeries }
-                            amiiboRepository.saveSeries(series)
                         }
                         HomeUiState.Success(
                             HomeData(
