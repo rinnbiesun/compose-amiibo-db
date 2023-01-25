@@ -14,13 +14,14 @@ Amiibo database using Jetpack Compose
 ### In Progress
 
 - [ ] Auto sync the remote data
+- [ ] No network handling
 
 ### Done ✓
 
 - [x] Home Page
 - [x] Amiibo List Page
-- [x] Offline data source
-- [x] CI/CD pipeline with GitHub Actions
+- [x] Offline data source for reducing request times on open source api 
+- [x] CI/CD pipeline with GitHub Actions (Generate a version tag & Create a GitHub release)
 
 
 ## Screenshot
