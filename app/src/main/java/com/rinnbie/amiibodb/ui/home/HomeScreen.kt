@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.placeholder
 import com.google.accompanist.placeholder.shimmer
@@ -232,8 +232,11 @@ private fun SeriesButton(
                  MaterialTheme.colorScheme.secondaryContainer, shape = CircleShape
              )*/, contentAlignment = Alignment.Center
         ) {
-            AsyncImage(
+            SubcomposeAsyncImage(
                 model = series.defaultAmiibo?.image,
+                error = {
+                    Text(text = "no network", textAlign = TextAlign.Center)
+                },
                 contentDescription = null,
             )
         }

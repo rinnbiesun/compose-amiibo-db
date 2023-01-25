@@ -25,6 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.palette.graphics.Palette
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ErrorResult
 import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.rinnbie.amiibodb.R
@@ -121,13 +122,20 @@ fun AmiiboItem(
 
     LaunchedEffect(key1 = imagePainter) {
         launch {
-            val result = (imageLoader.execute(request) as SuccessResult).drawable
-            val bitmap = (result as BitmapDrawable).bitmap
-            val vibrant = Palette.from(bitmap)
-                .generate()
-                .getVibrantColor(Color.White.value.toInt())
-            paletteColor = vibrant
-            bitmapImage = bitmap
+            when (val result = imageLoader.execute(request)) {
+                is SuccessResult -> {
+                    val bitmap = (result.drawable as BitmapDrawable).bitmap
+                    val vibrant = Palette.from(bitmap)
+                        .generate()
+                        .getVibrantColor(Color.White.value.toInt())
+                    paletteColor = vibrant
+                    bitmapImage = bitmap
+                }
+                is ErrorResult -> {
+
+                }
+            }
+
         }
     }
 
