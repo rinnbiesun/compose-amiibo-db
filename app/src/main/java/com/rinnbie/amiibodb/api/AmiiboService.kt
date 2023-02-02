@@ -1,6 +1,7 @@
 package com.rinnbie.amiibodb.api
 
 import com.rinnbie.amiibodb.data.AmiiboResponse
+import com.rinnbie.amiibodb.data.LastUpdated
 import com.rinnbie.amiibodb.data.SeriesResponse
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -15,6 +16,9 @@ interface AmiiboService {
 
     @GET("amiiboseries/")
     suspend fun getAllSeries(): SeriesResponse
+
+    @GET("lastupdated/")
+    suspend fun getLastUpdated(): LastUpdated
 
     companion object {
         private const val BASE_URL = "https://www.amiiboapi.com/api/"

@@ -12,4 +12,6 @@ interface AmiiboDataSource {
     suspend fun saveSeries(series: Series)
     suspend fun deleteAllAmiibos()
     suspend fun deleteAllSeries()
+    fun getLastUpdated(): Flow<String>
+    suspend fun saveLastUpdated(lastUpdated: String)
 }

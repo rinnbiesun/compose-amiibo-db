@@ -42,4 +42,13 @@ class RemoteAmiiboDataSource @Inject constructor(private val service: AmiiboServ
     override suspend fun deleteAllSeries() {
 
     }
+
+    override fun getLastUpdated(): Flow<String> {
+        return flow {
+            emit(service.getLastUpdated().lastUpdated)
+        }
+    }
+
+    override suspend fun saveLastUpdated(lastUpdated: String) {
+    }
 }

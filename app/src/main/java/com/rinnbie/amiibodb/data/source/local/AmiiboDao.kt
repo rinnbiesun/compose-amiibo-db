@@ -31,4 +31,10 @@ interface AmiiboDao {
 
     @Query("DELETE FROM Series")
     fun deleteAllSeries()
+
+    @Query("REPLACE INTO LastUpdated (lastUpdated) VALUES (:lastUpdated)")
+    suspend fun insertOrUpdateLastUpdated(lastUpdated: String)
+
+    @Query("SELECT lastUpdated FROM LastUpdated")
+    fun getLastUpdated(): Flow<String?>
 }

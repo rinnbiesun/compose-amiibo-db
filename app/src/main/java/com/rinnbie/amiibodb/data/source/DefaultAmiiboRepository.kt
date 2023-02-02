@@ -61,4 +61,13 @@ class DefaultAmiiboRepository @Inject constructor(
     override suspend fun deleteAllSeries() {
         localDataSource.deleteAllSeries()
     }
+
+    override fun getLastUpdated(): Flow<String> {
+        return localDataSource.getLastUpdated().flatMapConcat {
+            if (it.isEmpty()) {
+                return@flatMapConcat remoteDataSource.getLastUpdated()
+            }
+            return@flatMapConcat flow { emit(it) }
+        }
+    }
 }

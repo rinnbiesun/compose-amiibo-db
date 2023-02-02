@@ -4,6 +4,7 @@ import com.rinnbie.amiibodb.data.Amiibo
 import com.rinnbie.amiibodb.data.Series
 import com.rinnbie.amiibodb.data.source.AmiiboDataSource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class LocalAmiiboDataSource @Inject constructor(private val amiiboDao: AmiiboDao) :
@@ -36,5 +37,15 @@ class LocalAmiiboDataSource @Inject constructor(private val amiiboDao: AmiiboDao
 
     override suspend fun deleteAllSeries() {
         amiiboDao.deleteAllSeries()
+    }
+
+    override fun getLastUpdated(): Flow<String> {
+        return amiiboDao.getLastUpdated().map {
+            it.orEmpty()
+        }
+    }
+
+    override suspend fun saveLastUpdated(lastUpdated: String) {
+        amiiboDao.insertOrUpdateLastUpdated(lastUpdated)
     }
 }
