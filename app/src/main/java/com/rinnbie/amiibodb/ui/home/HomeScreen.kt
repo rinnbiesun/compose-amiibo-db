@@ -40,7 +40,7 @@ import com.rinnbie.amiibodb.ui.theme.Shapes
 fun HomeRoute(
     modifier: Modifier = Modifier,
     onNavigateToList: (String) -> Unit,
-    viewModel: MainViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     val homeState: HomeUiState by viewModel.homeUiState.collectAsStateWithLifecycle()
 

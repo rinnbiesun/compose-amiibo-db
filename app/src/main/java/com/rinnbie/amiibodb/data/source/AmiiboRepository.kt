@@ -11,5 +11,5 @@ interface AmiiboRepository {
     suspend fun saveSeries(series: Series)
     suspend fun deleteAllAmiibos()
     suspend fun deleteAllSeries()
-    fun getLastUpdated(): Flow<String>
+    fun checkForceUpdate(): Flow<Boolean>
 }

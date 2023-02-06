@@ -1,5 +1,6 @@
 package com.rinnbie.amiibodb.ui.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rinnbie.amiibodb.data.asResult
@@ -11,7 +12,7 @@ import com.rinnbie.amiibodb.model.HomeData
 import kotlinx.coroutines.flow.*
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
+class HomeViewModel @Inject constructor(
     amiiboRepository: AmiiboRepository
 ) : ViewModel() {
 
@@ -24,29 +25,33 @@ class MainViewModel @Inject constructor(
             )
 
     private fun homeUiStateStream(amiiboRepository: AmiiboRepository): Flow<HomeUiState> {
-        return combine(
-            amiiboRepository.getAllAmiibos(),
-            amiiboRepository.getAllSeries(),
-            ::Pair
-        ).asResult()
-            .map { homeResult ->
-                when (homeResult) {
-                    is Result.Success -> {
-                        val allAmiibo = homeResult.data.first
-                        val series = homeResult.data.second.onEach { series ->
-                            series.defaultAmiibo =
-                                allAmiibo.firstOrNull { series.name == it.amiiboSeries }
+        return amiiboRepository.checkForceUpdate()
+            .flatMapConcat {forceUpdate ->
+                Log.d("HomeViewModel", "forceUpdate=$forceUpdate")
+                combine(
+                    amiiboRepository.getAllAmiibos(forceUpdate),
+                    amiiboRepository.getAllSeries(forceUpdate),
+                    ::Pair
+                ).asResult()
+                    .map { homeResult ->
+                        when (homeResult) {
+                            is Result.Success -> {
+                                val allAmiibo = homeResult.data.first
+                                val series = homeResult.data.second.onEach { series ->
+                                    series.defaultAmiibo =
+                                        allAmiibo.firstOrNull { series.name == it.amiiboSeries }
+                                }
+                                HomeUiState.Success(
+                                    HomeData(
+                                        allAmiibo,
+                                        series
+                                    )
+                                )
+                            }
+                            is Result.Loading -> HomeUiState.Loading
+                            is Result.Error -> HomeUiState.Error
                         }
-                        HomeUiState.Success(
-                            HomeData(
-                                allAmiibo,
-                                series
-                            )
-                        )
                     }
-                    is Result.Loading -> HomeUiState.Loading
-                    is Result.Error -> HomeUiState.Error
-                }
             }
     }
 }

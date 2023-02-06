@@ -1,5 +1,6 @@
 package com.rinnbie.amiibodb.data.source
 
+import android.util.Log
 import com.rinnbie.amiibodb.data.Amiibo
 import com.rinnbie.amiibodb.data.Series
 import com.rinnbie.amiibodb.data.source.local.LocalAmiiboDataSource
@@ -62,12 +63,17 @@ class DefaultAmiiboRepository @Inject constructor(
         localDataSource.deleteAllSeries()
     }
 
-    override fun getLastUpdated(): Flow<String> {
-        return localDataSource.getLastUpdated().flatMapConcat {
-            if (it.isEmpty()) {
-                return@flatMapConcat remoteDataSource.getLastUpdated()
+    override fun checkForceUpdate(): Flow<Boolean> {
+        return localDataSource.getLastUpdated().flatMapConcat { lastUpdatedFromLocal ->
+            remoteDataSource.getLastUpdated().map { lastUpdatedFromRemote ->
+                Log.d("DefaultAmiiboRepository", "lastUpdatedFromLocal=$lastUpdatedFromLocal, lastUpdatedFromRemote=$lastUpdatedFromRemote")
+                if (lastUpdatedFromLocal.isEmpty() || lastUpdatedFromLocal != lastUpdatedFromRemote) {
+                    // when app is launched first time, force update is needed
+                    localDataSource.saveLastUpdated(lastUpdatedFromRemote)
+                    return@map true
+                }
+                return@map false
             }
-            return@flatMapConcat flow { emit(it) }
         }
     }
 }
