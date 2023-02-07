@@ -56,17 +56,17 @@ internal fun HomeScreen(
     when (homeState) {
         HomeUiState.Loading -> {
             Log.d("HomeScreen", "HomeUiState.Loading")
-            HomeLoadingScreen()
+            HomeLoadingScreen(homeState)
         }
         HomeUiState.Error -> {
             Log.d("HomeScreen", "HomeUiState.Error")
-            HomeEmptyScreen()
+            HomeEmptyScreen(homeState)
         }
         is HomeUiState.Success -> {
             Log.d("HomeScreen", "HomeUiState.Success")
             HomeContentScreen(
                 modifier,
-                homeState.homeData,
+                homeState,
                 onNavigateToList = onNavigateToList
             )
         }
@@ -74,13 +74,13 @@ internal fun HomeScreen(
 }
 
 @Composable
-private fun HomeEmptyScreen() {
-    HomeBody {}
+private fun HomeEmptyScreen(homeState: HomeUiState) {
+    HomeBody(uiState = homeState) {}
 }
 
 @Composable
-private fun HomeLoadingScreen() {
-    HomeBody {
+private fun HomeLoadingScreen(homeState: HomeUiState) {
+    HomeBody(uiState = homeState) {
         item {
             for (i in 0 until 12) {
                 Row {
@@ -96,12 +96,14 @@ private fun HomeLoadingScreen() {
 @Composable
 private fun HomeContentScreen(
     modifier: Modifier = Modifier,
-    homeData: HomeData = HomeData(),
+    homeState: HomeUiState.Success,
     onNavigateToList: (String) -> Unit = {},
 ) {
     HomeBody(
-        onNavigateToList = onNavigateToList
+        onNavigateToList = onNavigateToList,
+        uiState = homeState
     ) {
+        val homeData = homeState.homeData
         if (homeData.series.isNotEmpty()) {
             val cols = 3
             items(homeData.series.chunked(cols)) { items ->
@@ -122,6 +124,7 @@ private fun HomeContentScreen(
 @Composable
 private fun HomeBody(
     modifier: Modifier = Modifier,
+    uiState: HomeUiState,
     onNavigateToList: (String) -> Unit = {},
     content: LazyListScope.() -> Unit
 ) {
@@ -140,17 +143,20 @@ private fun HomeBody(
             item {
                 HomeHeader()
             }
-            item {
-                HomeSearchBar()
-            }
-            item {
-                AllAmiiboButton(
-                    text = stringResource(id = R.string.all), onNavigateToList = onNavigateToList
-                )
-            }
-            content()
-            item {
-                Box(modifier = Modifier.height(48.dp))
+            if (uiState != HomeUiState.Error) {
+                item {
+                    HomeSearchBar()
+                }
+                item {
+                    AllAmiiboButton(
+                        text = stringResource(id = R.string.all),
+                        onNavigateToList = onNavigateToList
+                    )
+                }
+                content()
+                item {
+                    Box(modifier = Modifier.height(48.dp))
+                }
             }
         }
     }
@@ -276,6 +282,6 @@ private fun AllAmiiboButton(
 @Composable
 fun DefaultPreview() {
     AmiiboDBTheme {
-        HomeContentScreen()
+        HomeContentScreen(homeState = HomeUiState.Success(HomeData()))
     }
 }
