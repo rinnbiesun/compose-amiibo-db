@@ -26,6 +26,9 @@ class HomeViewModel @Inject constructor(
 
     private fun homeUiStateStream(amiiboRepository: AmiiboRepository): Flow<HomeUiState> {
         return amiiboRepository.checkForceUpdate()
+            .catch {
+                Log.d("HomeViewModel", "forceUpdate error=$it")
+            }
             .flatMapConcat {forceUpdate ->
                 Log.d("HomeViewModel", "forceUpdate=$forceUpdate")
                 combine(

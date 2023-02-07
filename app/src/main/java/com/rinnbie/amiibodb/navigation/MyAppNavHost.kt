@@ -17,7 +17,7 @@ import com.rinnbie.amiibodb.ui.home.HomeRoute
 @Composable
 fun MyAppNavHost(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController(),
+    navController: NavHostController,
     startDestination: String = "home"
 ) {
     NavHost(

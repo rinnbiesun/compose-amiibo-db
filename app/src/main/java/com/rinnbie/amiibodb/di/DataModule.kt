@@ -5,6 +5,8 @@ import com.rinnbie.amiibodb.data.source.AmiiboRepository
 import com.rinnbie.amiibodb.data.source.DefaultAmiiboRepository
 import com.rinnbie.amiibodb.data.source.local.LocalAmiiboDataSource
 import com.rinnbie.amiibodb.data.source.remote.RemoteAmiiboDataSource
+import com.rinnbie.amiibodb.util.ConnectivityManagerNetworkMonitor
+import com.rinnbie.amiibodb.util.NetworkMonitor
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -30,6 +32,11 @@ interface DataModule {
     fun bindsDefaultAmiiboRepository(
         amiiboRepository: DefaultAmiiboRepository
     ): AmiiboRepository
+
+    @Binds
+    fun bindsNetworkMonitor(
+        networkMonitor: ConnectivityManagerNetworkMonitor
+    ): NetworkMonitor
 }
 
 @Qualifier
