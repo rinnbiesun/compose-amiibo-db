@@ -14,6 +14,7 @@ Amiibo database using Jetpack Compose
 ### In Progress
 
 - [ ] No network handling
+- [ ] Build local unit tests and instrumented tests
 
 ### Done ✓
 
