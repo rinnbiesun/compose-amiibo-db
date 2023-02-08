@@ -143,7 +143,26 @@ private fun HomeBody(
             item {
                 HomeHeader()
             }
-            if (uiState != HomeUiState.Error) {
+            if (uiState == HomeUiState.Error) {
+                item {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.error_screen),
+                            contentDescription = stringResource(
+                                id = R.string.error_screen
+                            )
+                        )
+                        Text(
+                            text = stringResource(id = R.string.error_message),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+                }
+            } else {
                 item {
                     HomeSearchBar()
                 }
@@ -280,8 +299,24 @@ private fun AllAmiiboButton(
 
 @Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
+fun HomeContentPreview() {
     AmiiboDBTheme {
         HomeContentScreen(homeState = HomeUiState.Success(HomeData()))
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeLoadingPreview() {
+    AmiiboDBTheme {
+        HomeLoadingScreen(homeState = HomeUiState.Loading)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeErrorPreview() {
+    AmiiboDBTheme {
+        HomeEmptyScreen(homeState = HomeUiState.Error)
     }
 }

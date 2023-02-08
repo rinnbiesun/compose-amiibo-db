@@ -54,6 +54,7 @@ class HomeViewModel @Inject constructor(
                     }
             }
             .catch {
+                Log.d("HomeViewModel", it.toString())
                 emit(HomeUiState.Error)
             }
     }
