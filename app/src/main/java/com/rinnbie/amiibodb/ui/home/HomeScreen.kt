@@ -120,6 +120,29 @@ private fun HomeContentScreen(
     }
 }
 
+@Composable
+fun HomeErrorScreen(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.error_screen),
+            contentDescription = stringResource(
+                id = R.string.error_screen
+            )
+        )
+        Text(
+            text = stringResource(id = R.string.error_message),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeBody(
@@ -128,41 +151,28 @@ private fun HomeBody(
     onNavigateToList: (String) -> Unit = {},
     content: LazyListScope.() -> Unit
 ) {
-    Column {
-        TopAppBar(
-            title = {
-                Text(text = stringResource(id = R.string.app_name))
-            }
-        )
-        LazyColumn(
-            modifier = modifier
-                .padding(horizontal = 16.dp)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            item {
-                HomeHeader()
-            }
-            if (uiState == HomeUiState.Error) {
-                item {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.error_screen),
-                            contentDescription = stringResource(
-                                id = R.string.error_screen
-                            )
-                        )
-                        Text(
-                            text = stringResource(id = R.string.error_message),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
+
+    if (uiState == HomeUiState.Error) {
+        Box {
+            HomeAppBar()
+            HomeErrorScreen()
+        }
+    } else {
+        Column {
+            TopAppBar(
+                title = {
+                    Text(text = stringResource(id = R.string.app_name))
                 }
-            } else {
+            )
+            LazyColumn(
+                modifier = modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                item {
+                    HomeHeader()
+                }
                 item {
                     HomeSearchBar()
                 }
@@ -179,6 +189,16 @@ private fun HomeBody(
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HomeAppBar() {
+    TopAppBar(
+        title = {
+            Text(text = stringResource(id = R.string.app_name))
+        }
+    )
 }
 
 @Composable
@@ -317,6 +337,9 @@ fun HomeLoadingPreview() {
 @Composable
 fun HomeErrorPreview() {
     AmiiboDBTheme {
-        HomeEmptyScreen(homeState = HomeUiState.Error)
+        Box {
+            HomeAppBar()
+            HomeErrorScreen()
+        }
     }
 }
