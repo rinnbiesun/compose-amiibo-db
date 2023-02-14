@@ -1,10 +1,10 @@
 package com.rinnbie.amiibodb.data.source.local
 
 import com.rinnbie.amiibodb.data.Amiibo
+import com.rinnbie.amiibodb.data.LastUpdated
 import com.rinnbie.amiibodb.data.Series
 import com.rinnbie.amiibodb.data.source.AmiiboDataSource
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 class LocalAmiiboDataSource @Inject constructor(private val amiiboDao: AmiiboDao) :
@@ -40,12 +40,17 @@ class LocalAmiiboDataSource @Inject constructor(private val amiiboDao: AmiiboDao
     }
 
     override fun getLastUpdated(): Flow<String> {
-        return amiiboDao.getLastUpdated().map {
-            it.orEmpty()
+        return flow {
+            emit(amiiboDao.getLastUpdated()?.lastUpdated.orEmpty())
         }
     }
 
     override suspend fun saveLastUpdated(lastUpdated: String) {
-        amiiboDao.insertOrUpdateLastUpdated(lastUpdated)
+        amiiboDao.getLastUpdated()?.let { lastUpdatedFromLocal ->
+            lastUpdatedFromLocal.lastUpdated = lastUpdated
+            amiiboDao.updateLastUpdated(lastUpdatedFromLocal)
+        } ?: run {
+            amiiboDao.insertLastUpdated(LastUpdated(lastUpdated = lastUpdated))
+        }
     }
 }

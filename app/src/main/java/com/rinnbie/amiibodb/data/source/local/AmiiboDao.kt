@@ -1,10 +1,8 @@
 package com.rinnbie.amiibodb.data.source.local
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.rinnbie.amiibodb.data.Amiibo
+import com.rinnbie.amiibodb.data.LastUpdated
 import com.rinnbie.amiibodb.data.Series
 import kotlinx.coroutines.flow.Flow
 
@@ -32,9 +30,12 @@ interface AmiiboDao {
     @Query("DELETE FROM Series")
     fun deleteAllSeries()
 
-    @Query("REPLACE INTO LastUpdated (lastUpdated) VALUES (:lastUpdated)")
-    suspend fun insertOrUpdateLastUpdated(lastUpdated: String)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertLastUpdated(lastUpdated: LastUpdated)
 
-    @Query("SELECT lastUpdated FROM LastUpdated")
-    fun getLastUpdated(): Flow<String?>
+    @Update
+    suspend fun updateLastUpdated(lastUpdated: LastUpdated)
+
+    @Query("SELECT * FROM LastUpdated LIMIT 1")
+    suspend fun getLastUpdated(): LastUpdated?
 }
