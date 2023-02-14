@@ -44,7 +44,13 @@ fun HomeRoute(
 ) {
     val homeState: HomeUiState by viewModel.homeUiState.collectAsStateWithLifecycle()
 
-    HomeScreen(modifier = modifier, homeState = homeState, onNavigateToList = onNavigateToList)
+    HomeScreen(
+        modifier = modifier,
+        homeState = homeState,
+        onNavigateToList = onNavigateToList,
+        onTryAgainClick = {
+            // TODO refresh the page
+        })
 }
 
 @Composable
@@ -52,15 +58,16 @@ internal fun HomeScreen(
     modifier: Modifier = Modifier,
     homeState: HomeUiState,
     onNavigateToList: (String) -> Unit,
+    onTryAgainClick: () -> Unit = {},
 ) {
     when (homeState) {
         HomeUiState.Loading -> {
             Log.d("HomeScreen", "HomeUiState.Loading")
-            HomeLoadingScreen(homeState)
+            HomeLoadingScreen()
         }
         HomeUiState.Error -> {
             Log.d("HomeScreen", "HomeUiState.Error")
-            HomeEmptyScreen(homeState)
+            HomeErrorScreen()
         }
         is HomeUiState.Success -> {
             Log.d("HomeScreen", "HomeUiState.Success")
@@ -74,13 +81,8 @@ internal fun HomeScreen(
 }
 
 @Composable
-private fun HomeEmptyScreen(homeState: HomeUiState) {
-    HomeBody(uiState = homeState) {}
-}
-
-@Composable
-private fun HomeLoadingScreen(homeState: HomeUiState) {
-    HomeBody(uiState = homeState) {
+private fun HomeLoadingScreen() {
+    HomeBody() {
         item {
             for (i in 0 until 12) {
                 Row {
@@ -101,7 +103,6 @@ private fun HomeContentScreen(
 ) {
     HomeBody(
         onNavigateToList = onNavigateToList,
-        uiState = homeState
     ) {
         val homeData = homeState.homeData
         if (homeData.series.isNotEmpty()) {
@@ -121,9 +122,22 @@ private fun HomeContentScreen(
 }
 
 @Composable
-fun HomeErrorScreen(modifier: Modifier = Modifier) {
+private fun HomeErrorScreen(
+    onTryAgainClick: () -> Unit = {},
+) {
+    Box {
+        HomeAppBar()
+        HomeHeader()
+        ErrorContent(onTryAgainClick = onTryAgainClick)
+    }
+}
+
+@Composable
+fun ErrorContent(
+    onTryAgainClick: () -> Unit = {},
+) {
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(),
         verticalArrangement = Arrangement.Center,
@@ -140,6 +154,13 @@ fun HomeErrorScreen(modifier: Modifier = Modifier) {
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = onTryAgainClick) {
+            Text(
+                text = stringResource(id = R.string.try_again),
+                style = MaterialTheme.typography.labelLarge
+            )
+        }
     }
 }
 
@@ -147,45 +168,36 @@ fun HomeErrorScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun HomeBody(
     modifier: Modifier = Modifier,
-    uiState: HomeUiState,
     onNavigateToList: (String) -> Unit = {},
     content: LazyListScope.() -> Unit
 ) {
-
-    if (uiState == HomeUiState.Error) {
-        Box {
-            HomeAppBar()
-            HomeErrorScreen()
-        }
-    } else {
-        Column {
-            TopAppBar(
-                title = {
-                    Text(text = stringResource(id = R.string.app_name))
-                }
-            )
-            LazyColumn(
-                modifier = modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                item {
-                    HomeHeader()
-                }
-                item {
-                    HomeSearchBar()
-                }
-                item {
-                    AllAmiiboButton(
-                        text = stringResource(id = R.string.all),
-                        onNavigateToList = onNavigateToList
-                    )
-                }
-                content()
-                item {
-                    Box(modifier = Modifier.height(48.dp))
-                }
+    Column {
+        TopAppBar(
+            title = {
+                Text(text = stringResource(id = R.string.app_name))
+            }
+        )
+        LazyColumn(
+            modifier = modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                HomeHeader()
+            }
+            item {
+                HomeSearchBar()
+            }
+            item {
+                AllAmiiboButton(
+                    text = stringResource(id = R.string.all),
+                    onNavigateToList = onNavigateToList
+                )
+            }
+            content()
+            item {
+                Box(modifier = Modifier.height(48.dp))
             }
         }
     }
@@ -203,13 +215,9 @@ private fun HomeAppBar() {
 
 @Composable
 private fun HomeHeader() {
-    Column(
-        modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
         val image: Painter = painterResource(id = R.drawable.logo_amiibo)
-        Image(
-            modifier = Modifier.fillMaxSize(0.4f), painter = image, contentDescription = ""
-        )
+        Image(modifier = Modifier.fillMaxSize(0.4f), painter = image, contentDescription = "")
     }
 }
 
@@ -329,17 +337,14 @@ fun HomeContentPreview() {
 @Composable
 fun HomeLoadingPreview() {
     AmiiboDBTheme {
-        HomeLoadingScreen(homeState = HomeUiState.Loading)
+        HomeLoadingScreen()
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, heightDp = 1000)
 @Composable
 fun HomeErrorPreview() {
     AmiiboDBTheme {
-        Box {
-            HomeAppBar()
-            HomeErrorScreen()
-        }
+        HomeErrorScreen()
     }
 }
