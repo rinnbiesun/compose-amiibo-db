@@ -49,7 +49,7 @@ fun HomeRoute(
         homeState = homeState,
         onNavigateToList = onNavigateToList,
         onTryAgainClick = {
-            // TODO refresh the page
+            viewModel.refreshUiState()
         })
 }
 
@@ -67,7 +67,9 @@ internal fun HomeScreen(
         }
         HomeUiState.Error -> {
             Log.d("HomeScreen", "HomeUiState.Error")
-            HomeErrorScreen()
+            HomeErrorScreen(
+                onTryAgainClick = onTryAgainClick
+            )
         }
         is HomeUiState.Success -> {
             Log.d("HomeScreen", "HomeUiState.Success")
