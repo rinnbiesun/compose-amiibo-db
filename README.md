@@ -13,8 +13,8 @@ Amiibo database using Jetpack Compose
 
 ### In Progress
 
-- [ ] No network handling
 - [ ] Build local unit tests and instrumented tests
+- [ ] Amiibo Details Page
 
 ### Done ✓
 
@@ -23,6 +23,7 @@ Amiibo database using Jetpack Compose
 - [x] Offline data source for reducing request times on open source api 
 - [x] CI/CD pipeline with GitHub Actions (Generate a version tag & Create a GitHub release)
 - [x] Auto sync the remote data
+- [x] No network handling
 
 
 ## Screenshot
