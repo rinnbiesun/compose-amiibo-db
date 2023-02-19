@@ -22,6 +22,10 @@ class LocalAmiiboDataSource @Inject constructor(private val amiiboDao: AmiiboDao
         return amiiboDao.getAmiibosBySeries(seriesName)
     }
 
+    override fun getAmiibo(id: String): Flow<Amiibo> {
+        return amiiboDao.getAmiibo(id)
+    }
+
     override suspend fun saveAmiibo(amiibo: Amiibo) {
         amiibo.id = amiibo.head + amiibo.tail
         amiiboDao.insertAmiibo(amiibo)

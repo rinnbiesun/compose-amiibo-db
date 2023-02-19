@@ -27,6 +27,10 @@ class RemoteAmiiboDataSource @Inject constructor(private val service: AmiiboServ
         TODO("Not yet implemented")
     }
 
+    override fun getAmiibo(id: String): Flow<Amiibo> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun saveAmiibo(amiibo: Amiibo) {
 
     }

@@ -8,9 +8,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.rinnbie.amiibodb.R
+import com.rinnbie.amiibodb.ui.amiibo.AmiiboDetailRoute
 import com.rinnbie.amiibodb.ui.amiibo.AmiiboListRoute
 import com.rinnbie.amiibodb.ui.home.HomeRoute
 
@@ -37,7 +37,24 @@ fun MyAppNavHost(
         ) { backStackEntry ->
             val seriesName = backStackEntry.arguments?.getString("seriesArg")
             AmiiboListRoute(
+                modifier = modifier,
                 title = if (seriesName == "all") stringResource(id = R.string.all) else seriesName,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onAmiiboClick = { id ->
+                    navController.navigate(route = "amiibo/$id")
+                }
+            )
+        }
+
+        composable(
+            route = "amiibo/{id}",
+            arguments = listOf(
+                navArgument("id") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id").orEmpty()
+            AmiiboDetailRoute(
                 modifier = modifier,
                 onNavigateBack = {
                     navController.popBackStack()

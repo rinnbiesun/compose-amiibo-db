@@ -5,6 +5,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -36,9 +37,10 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AmiiboListRoute(
-    title: String? = null,
     modifier: Modifier = Modifier,
+    title: String? = null,
     onNavigateBack: () -> Unit,
+    onAmiiboClick: (String) -> Unit,
     viewModel: AmiiboListViewModel = hiltViewModel()
 ) {
     val amiiboListUiState: AmiiboListUiState by viewModel.amiiboListUiState.collectAsStateWithLifecycle()
@@ -54,14 +56,19 @@ fun AmiiboListRoute(
                 }
             }
         )
-        AmiiboListScreen(modifier = modifier, amiiboListUiState = amiiboListUiState)
+        AmiiboListScreen(
+            modifier = modifier,
+            amiiboListUiState = amiiboListUiState,
+            onAmiiboClick = onAmiiboClick
+        )
     }
 }
 
 @Composable
 internal fun AmiiboListScreen(
     modifier: Modifier = Modifier,
-    amiiboListUiState: AmiiboListUiState
+    amiiboListUiState: AmiiboListUiState,
+    onAmiiboClick: (String) -> Unit,
 ) {
     when (amiiboListUiState) {
         AmiiboListUiState.Loading -> {
@@ -74,7 +81,8 @@ internal fun AmiiboListScreen(
             Log.d("AmiiboListScreen", "HomeUiState.Success")
             ListBody(
                 modifier = modifier,
-                amiibos = amiiboListUiState.amiibos
+                amiibos = amiiboListUiState.amiibos,
+                onAmiiboClick = onAmiiboClick
             )
         }
     }
@@ -83,7 +91,8 @@ internal fun AmiiboListScreen(
 @Composable
 fun ListBody(
     modifier: Modifier = Modifier,
-    amiibos: List<Amiibo>
+    amiibos: List<Amiibo>,
+    onAmiiboClick: (String) -> Unit = {},
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
@@ -94,7 +103,7 @@ fun ListBody(
         items(
             count = amiibos.size
         ) { index ->
-            AmiiboItem(modifier, amiibos[index])
+            AmiiboItem(modifier, amiibos[index], onAmiiboClick = onAmiiboClick)
         }
     }
 }
@@ -102,7 +111,8 @@ fun ListBody(
 @Composable
 fun AmiiboItem(
     modifier: Modifier = Modifier,
-    amiibo: Amiibo
+    amiibo: Amiibo,
+    onAmiiboClick: (String) -> Unit,
 ) {
     val context = LocalContext.current
     val imageLoader = ImageLoader(context)
@@ -143,7 +153,8 @@ fun AmiiboItem(
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(1f)
-            .background(color = Color(paletteColor), shape = Shapes.medium),
+            .background(color = Color(paletteColor), shape = Shapes.medium)
+            .clickable { onAmiiboClick(amiibo.id) },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
