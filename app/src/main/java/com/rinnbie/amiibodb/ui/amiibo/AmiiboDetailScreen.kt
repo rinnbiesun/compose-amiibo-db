@@ -17,6 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.rinnbie.amiibodb.R
 import com.rinnbie.amiibodb.data.Amiibo
+import com.rinnbie.amiibodb.data.Release
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,27 +74,37 @@ fun AmiiboDetailBody(
     isPreview: Boolean = false,
 ) {
     Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
     ) {
-        Text(text = "${amiibo.name}", style = MaterialTheme.typography.titleLarge)
-        Text(text = "${amiibo.amiiboSeries}", style = MaterialTheme.typography.titleSmall)
-        Spacer(modifier = Modifier.height(48.dp))
-        if (!isPreview) {
-            AsyncImage(
-                modifier = modifier,
-                model = amiibo.image,
-                error = painterResource(id = R.drawable.no_image),
-                contentDescription = null
-            )
-        } else {
-            Image(
-                modifier = Modifier.padding(10.dp),
-                painter = painterResource(id = R.drawable.testing_image),
-                contentDescription = null
-            )
+        Column(
+            modifier = modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "${amiibo.name}", style = MaterialTheme.typography.titleLarge)
+            Text(text = "${amiibo.amiiboSeries}", style = MaterialTheme.typography.titleSmall)
+            Spacer(modifier = Modifier.height(24.dp))
+            if (!isPreview) {
+                AsyncImage(
+                    modifier = modifier,
+                    model = amiibo.image,
+                    error = painterResource(id = R.drawable.no_image),
+                    contentDescription = null
+                )
+            } else {
+                Image(
+                    modifier = Modifier.padding(10.dp),
+                    painter = painterResource(id = R.drawable.testing_image),
+                    contentDescription = null
+                )
+            }
         }
-        Text(text = "Detail Screen #${amiibo.id}")
+        Text(text = "Release Date", style = MaterialTheme.typography.titleMedium)
+        Text(text = "au ${amiibo.release?.au}", style = MaterialTheme.typography.titleSmall)
+        Text(text = "eu ${amiibo.release?.eu}", style = MaterialTheme.typography.titleSmall)
+        Text(text = "jp ${amiibo.release?.jp}", style = MaterialTheme.typography.titleSmall)
+        Text(text = "na ${amiibo.release?.na}", style = MaterialTheme.typography.titleSmall)
     }
 }
 
@@ -106,8 +117,14 @@ fun AmiiboDetailScreenPreview() {
 @Preview(showBackground = true)
 @Composable
 fun AmiiboDetailBodyPreview() {
+    val release = Release("2014-11-29", "2014-11-29", "2014-11-29", "2014-11-29")
     AmiiboDetailBody(
-        amiibo = Amiibo(id = "1", name = "カズヤ", amiiboSeries = "大乱闘スマッシュブラザーズシリーズ"),
+        amiibo = Amiibo(
+            id = "1",
+            name = "カズヤ",
+            amiiboSeries = "大乱闘スマッシュブラザーズシリーズ",
+            release = release
+        ),
         isPreview = true
     )
 }

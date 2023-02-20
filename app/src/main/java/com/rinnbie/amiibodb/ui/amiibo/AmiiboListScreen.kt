@@ -145,7 +145,6 @@ fun AmiiboItem(
 
                 }
             }
-
         }
     }
 
