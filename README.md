@@ -7,7 +7,6 @@ Amiibo database using Jetpack Compose
 ### Todo
 
 - [ ] Search feature
-- [ ] Amiibo Details Page
 - [ ] Add Amiibo to Favorite
 - [ ] Testing Glide image loading library
 
