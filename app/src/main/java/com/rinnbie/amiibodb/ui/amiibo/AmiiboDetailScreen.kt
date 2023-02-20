@@ -1,5 +1,6 @@
 package com.rinnbie.amiibodb.ui.amiibo
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -82,8 +83,14 @@ fun AmiiboDetailBody(
             modifier = modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "${amiibo.name}", style = MaterialTheme.typography.titleLarge)
-            Text(text = "${amiibo.amiiboSeries}", style = MaterialTheme.typography.titleSmall)
+            Text(
+                text = "${amiibo.name}",
+                style = MaterialTheme.typography.titleLarge
+            )
+            Text(
+                text = "${amiibo.amiiboSeries}",
+                style = MaterialTheme.typography.titleSmall
+            )
             Spacer(modifier = Modifier.height(24.dp))
             if (!isPreview) {
                 AsyncImage(
@@ -100,32 +107,78 @@ fun AmiiboDetailBody(
                 )
             }
         }
-        Text(text = "Release Date", style = MaterialTheme.typography.titleMedium)
-        Text(text = "au ${amiibo.release?.au}", style = MaterialTheme.typography.titleSmall)
-        Text(text = "eu ${amiibo.release?.eu}", style = MaterialTheme.typography.titleSmall)
-        Text(text = "jp ${amiibo.release?.jp}", style = MaterialTheme.typography.titleSmall)
-        Text(text = "na ${amiibo.release?.na}", style = MaterialTheme.typography.titleSmall)
+        Spacer(modifier = Modifier.height(16.dp))
+        ReleaseDateSection(amiibo)
     }
 }
 
+@Composable
+private fun ReleaseDateSection(amiibo: Amiibo) {
+    if (!amiibo.release?.au.isNullOrEmpty()) {
+        ReleaseDateItem(R.drawable.logo_australia, "au", amiibo.release?.au)
+        Spacer(modifier = Modifier.height(8.dp))
+    }
+
+    if (!amiibo.release?.eu.isNullOrEmpty()) {
+        ReleaseDateItem(R.drawable.logo_europe, "eu", amiibo.release?.eu)
+        Spacer(modifier = Modifier.height(8.dp))
+    }
+
+    if (!amiibo.release?.jp.isNullOrEmpty()) {
+        ReleaseDateItem(R.drawable.logo_japan, "jp", amiibo.release?.jp)
+        Spacer(modifier = Modifier.height(8.dp))
+    }
+
+    if (!amiibo.release?.na.isNullOrEmpty()) {
+        ReleaseDateItem(R.drawable.logo_north_america, "na", amiibo.release?.na)
+    }
+}
+
+@Composable
+private fun ReleaseDateItem(
+    @DrawableRes id: Int,
+    contentDescription: String,
+    releaseDate: String?
+) {
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Image(
+            modifier = Modifier
+                .height(25.dp),
+            painter = painterResource(id),
+            contentDescription = contentDescription
+        )
+        Spacer(modifier = Modifier.width(5.dp))
+        Text(
+            text = releaseDate.orEmpty(),
+            style = MaterialTheme.typography.titleMedium
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun AmiiboDetailScreenPreview() {
-    AmiiboDetailRoute()
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AmiiboDetailBodyPreview() {
     val release = Release("2014-11-29", "2014-11-29", "2014-11-29", "2014-11-29")
-    AmiiboDetailBody(
-        amiibo = Amiibo(
-            id = "1",
-            name = "カズヤ",
-            amiiboSeries = "大乱闘スマッシュブラザーズシリーズ",
-            release = release
-        ),
-        isPreview = true
+    val amiibo = Amiibo(
+        id = "1",
+        name = "カズヤ",
+        amiiboSeries = "大乱闘スマッシュブラザーズシリーズ",
+        release = release
     )
+    Column {
+        CenterAlignedTopAppBar(
+            title = { Text(text = amiibo.name.orEmpty()) },
+            navigationIcon = {
+                IconButton(onClick = { }) {
+                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
+                }
+            }
+        )
+        AmiiboDetailBody(
+            amiibo = amiibo,
+            isPreview = true
+        )
+    }
 }
 
