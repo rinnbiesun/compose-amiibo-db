@@ -94,14 +94,14 @@ fun AmiiboDetailBody(
                 Spacer(modifier = Modifier.height(24.dp))
                 if (!isPreview) {
                     AsyncImage(
-                        modifier = modifier,
+                        modifier = modifier.height(200.dp),
                         model = amiibo.image,
                         error = painterResource(id = R.drawable.no_image),
                         contentDescription = null
                     )
                 } else {
                     Image(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = Modifier.height(200.dp),
                         painter = painterResource(id = R.drawable.testing_image),
                         contentDescription = null
                     )
@@ -116,7 +116,7 @@ fun AmiiboDetailBody(
 
 @Composable
 private fun SeriesSection() {
-
+    // TODO
 }
 
 @Composable
@@ -129,13 +129,15 @@ private fun ReleaseDateSection(amiibo: Amiibo) {
     )
 
     for ((index, releaseDateObj) in releaseDateObjList.withIndex()) {
-        ReleaseDateItem(
-            releaseDateObj.id,
-            releaseDateObj.contentDescription,
-            releaseDateObj.releaseDate
-        )
-        if (index < releaseDateObjList.size - 1) {
-            Spacer(modifier = Modifier.height(8.dp))
+        if (!releaseDateObj.releaseDate.isNullOrEmpty()) {
+            ReleaseDateItem(
+                releaseDateObj.id,
+                releaseDateObj.contentDescription,
+                releaseDateObj.releaseDate
+            )
+            if (index < releaseDateObjList.size - 1) {
+                Spacer(modifier = Modifier.height(8.dp))
+            }
         }
     }
 }
@@ -161,7 +163,6 @@ private fun ReleaseDateItem(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun AmiiboDetailScreenPreview() {
