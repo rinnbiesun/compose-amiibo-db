@@ -6,14 +6,13 @@ Amiibo database using Jetpack Compose
 ## My Tasks
 ### Todo
 
-- [ ] Search feature
 - [ ] Add Amiibo to Favorite
 - [ ] Testing Glide image loading library
 
 ### In Progress
 
-- [ ] Build local unit tests and instrumented tests
 - [ ] Amiibo Details Page
+- [ ] Search feature
 
 ### Done ✓
 
