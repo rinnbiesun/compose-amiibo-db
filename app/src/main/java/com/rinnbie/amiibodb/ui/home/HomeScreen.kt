@@ -1,6 +1,8 @@
 package com.rinnbie.amiibodb.ui.home
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,8 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +33,7 @@ import com.google.accompanist.placeholder.shimmer
 import com.rinnbie.amiibodb.R
 import com.rinnbie.amiibodb.data.Series
 import com.rinnbie.amiibodb.model.HomeData
+import com.rinnbie.amiibodb.ui.search.SearchView
 import com.rinnbie.amiibodb.ui.theme.AmiiboDBTheme
 import com.rinnbie.amiibodb.ui.theme.Shapes
 
@@ -173,33 +175,50 @@ private fun HomeBody(
     onNavigateToList: (String) -> Unit = {},
     content: LazyListScope.() -> Unit
 ) {
+
+    var isSearchMode by remember { mutableStateOf(false) }
+    val offset by animateFloatAsState(targetValue = if (isSearchMode) 0f else 1f)
+
     Column {
-        TopAppBar(
-            title = {
-                Text(text = stringResource(id = R.string.app_name))
-            }
-        )
+        AnimatedVisibility(visible = !isSearchMode) {
+            TopAppBar(
+                title = {
+                    Text(text = stringResource(id = R.string.app_name))
+                },
+                colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+            )
+        }
         LazyColumn(
             modifier = modifier
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp * offset)
                 .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp * offset),
+            contentPadding = PaddingValues(bottom = 48.dp * offset)
         ) {
             item {
-                HomeHeader()
+                AnimatedVisibility(visible = !isSearchMode) {
+                    HomeHeader()
+                }
             }
-            item {
-                HomeSearchBar()
-            }
-            item {
-                AllAmiiboButton(
-                    text = stringResource(id = R.string.all),
-                    onNavigateToList = onNavigateToList
-                )
-            }
-            content()
-            item {
-                Box(modifier = Modifier.height(48.dp))
+
+            if (!isSearchMode) {
+                item {
+                    HomeSearchBar(onSearchBarClick = {
+                        isSearchMode = true
+                    })
+                }
+
+                item {
+                    AllAmiiboButton(
+                        text = stringResource(id = R.string.all),
+                        onNavigateToList = onNavigateToList
+                    )
+                }
+                content()
+            } else {
+                item {
+                    SearchView()
+                }
             }
         }
     }
@@ -224,12 +243,15 @@ private fun HomeHeader() {
 }
 
 @Composable
-private fun HomeSearchBar() {
+private fun HomeSearchBar(
+    onSearchBarClick: () -> Unit = {},
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 24.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)
-            .background(MaterialTheme.colorScheme.inverseOnSurface, CircleShape),
+            .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+            .clickable { onSearchBarClick() },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
