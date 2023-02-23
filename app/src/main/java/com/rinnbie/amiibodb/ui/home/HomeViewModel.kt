@@ -30,6 +30,8 @@ class HomeViewModel @Inject constructor(
                 initialValue = viewModelState.value.toUiState()
             )
 
+    val query = MutableStateFlow("")
+
     init {
         refreshUiState()
     }
@@ -96,6 +98,16 @@ class HomeViewModel @Inject constructor(
                 Log.d("HomeViewModel", it.toString())
                 emit(Result.Error(it))
             }
+    }
+
+    fun search(query: String) {
+        viewModelScope.launch {
+            this@HomeViewModel.query.emit(query)
+        }
+    }
+
+    fun clearQuery() {
+        query.tryEmit("")
     }
 }
 

@@ -46,15 +46,19 @@ fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val homeState: HomeUiState by viewModel.homeUiState.collectAsStateWithLifecycle()
+    val query: String by viewModel.query.collectAsStateWithLifecycle()
 
     HomeScreen(
         modifier = modifier,
         homeState = homeState,
+        query = query,
         onNavigateToList = onNavigateToList,
         onTryAgainClick = {
             viewModel.refreshUiState()
         },
-        onBackClick = onBackClick
+        onBackClick = onBackClick,
+        onClearClick = viewModel::clearQuery,
+        onQueryChange = viewModel::search
     )
 }
 
@@ -62,9 +66,12 @@ fun HomeRoute(
 internal fun HomeScreen(
     modifier: Modifier = Modifier,
     homeState: HomeUiState,
+    query: String,
     onNavigateToList: (String) -> Unit,
     onTryAgainClick: () -> Unit = {},
-    onBackClick: () -> Unit,
+    onBackClick: () -> Unit = {},
+    onClearClick: () -> Unit = {},
+    onQueryChange: (String) -> Unit = {},
 ) {
     when (homeState) {
         HomeUiState.Loading -> {
@@ -80,10 +87,13 @@ internal fun HomeScreen(
         is HomeUiState.Success -> {
             Log.d("HomeScreen", "HomeUiState.Success")
             HomeContentScreen(
-                modifier,
-                homeState,
+                modifier = modifier,
+                homeState = homeState,
+                query = query,
                 onNavigateToList = onNavigateToList,
-                onBackClick = onBackClick
+                onBackClick = onBackClick,
+                onClearClick = onClearClick,
+                onQueryChange = onQueryChange
             )
         }
     }
@@ -108,12 +118,18 @@ private fun HomeLoadingScreen() {
 private fun HomeContentScreen(
     modifier: Modifier = Modifier,
     homeState: HomeUiState.Success,
+    query: String = "",
     onNavigateToList: (String) -> Unit = {},
     onBackClick: () -> Unit = {},
+    onClearClick: () -> Unit = {},
+    onQueryChange: (String) -> Unit = {},
 ) {
     HomeBody(
+        query = query,
         onNavigateToList = onNavigateToList,
         onBackClick = onBackClick,
+        onClearClick = onClearClick,
+        onQueryChange = onQueryChange,
     ) {
         val homeData = homeState.homeData
         if (homeData.series.isNotEmpty()) {
@@ -179,8 +195,11 @@ fun ErrorContent(
 @Composable
 private fun HomeBody(
     modifier: Modifier = Modifier,
+    query: String = "",
     onNavigateToList: (String) -> Unit = {},
     onBackClick: () -> Unit = {},
+    onClearClick: () -> Unit = {},
+    onQueryChange: (String) -> Unit = {},
     content: LazyListScope.() -> Unit
 ) {
 
@@ -225,9 +244,14 @@ private fun HomeBody(
                 content()
             } else {
                 item {
-                    SearchTextField(onBackClick = {
-                        isSearchMode = false
-                    })
+                    SearchTextField(
+                        query = query,
+                        onBackClick = {
+                            isSearchMode = false
+                        },
+                        onClearClick = onClearClick,
+                        onQueryChange = onQueryChange
+                    )
                 }
             }
         }

@@ -21,7 +21,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.rinnbie.amiibodb.R
@@ -29,10 +28,12 @@ import com.rinnbie.amiibodb.R
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchTextField(
+    query: String,
     onBackClick: () -> Unit = {},
+    onClearClick: () -> Unit = {},
+    onQueryChange: (String) -> Unit = {},
 ) {
     Surface(color = MaterialTheme.colorScheme.surfaceVariant) {
-        var textValue by remember { mutableStateOf(TextFieldValue("")) }
         val focusRequester = remember { FocusRequester() }
 
         LaunchedEffect(Unit) {
@@ -40,7 +41,7 @@ fun SearchTextField(
         }
 
         BasicTextField(
-            value = textValue,
+            value = query,
             modifier = Modifier
                 .height(72.dp)
                 .focusRequester(focusRequester)
@@ -54,17 +55,13 @@ fun SearchTextField(
                 },
             textStyle = MaterialTheme.typography.bodyLarge,
             singleLine = true,
+            onValueChange = onQueryChange,
             decorationBox = { innerTextField ->
                 SearchTextFieldLayout(
                     onBackClick = onBackClick,
-                    onClearClick = {
-                        textValue = TextFieldValue("")
-                    },
+                    onClearClick = onClearClick,
                     textField = innerTextField
                 )
-            },
-            onValueChange = {
-                textValue = it
             },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text
@@ -115,5 +112,5 @@ fun SearchTextFieldLayout(
 @Preview(showBackground = true)
 @Composable
 fun SearchTextFieldPreview() {
-    SearchTextField()
+    SearchTextField("ABC")
 }
