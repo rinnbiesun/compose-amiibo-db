@@ -33,7 +33,7 @@ import com.google.accompanist.placeholder.shimmer
 import com.rinnbie.amiibodb.R
 import com.rinnbie.amiibodb.data.Series
 import com.rinnbie.amiibodb.model.HomeData
-import com.rinnbie.amiibodb.ui.search.SearchView
+import com.rinnbie.amiibodb.ui.search.SearchTextField
 import com.rinnbie.amiibodb.ui.theme.AmiiboDBTheme
 import com.rinnbie.amiibodb.ui.theme.Shapes
 
@@ -42,6 +42,7 @@ import com.rinnbie.amiibodb.ui.theme.Shapes
 fun HomeRoute(
     modifier: Modifier = Modifier,
     onNavigateToList: (String) -> Unit,
+    onBackClick: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val homeState: HomeUiState by viewModel.homeUiState.collectAsStateWithLifecycle()
@@ -52,7 +53,9 @@ fun HomeRoute(
         onNavigateToList = onNavigateToList,
         onTryAgainClick = {
             viewModel.refreshUiState()
-        })
+        },
+        onBackClick = onBackClick
+    )
 }
 
 @Composable
@@ -61,6 +64,7 @@ internal fun HomeScreen(
     homeState: HomeUiState,
     onNavigateToList: (String) -> Unit,
     onTryAgainClick: () -> Unit = {},
+    onBackClick: () -> Unit,
 ) {
     when (homeState) {
         HomeUiState.Loading -> {
@@ -78,7 +82,8 @@ internal fun HomeScreen(
             HomeContentScreen(
                 modifier,
                 homeState,
-                onNavigateToList = onNavigateToList
+                onNavigateToList = onNavigateToList,
+                onBackClick = onBackClick
             )
         }
     }
@@ -104,9 +109,11 @@ private fun HomeContentScreen(
     modifier: Modifier = Modifier,
     homeState: HomeUiState.Success,
     onNavigateToList: (String) -> Unit = {},
+    onBackClick: () -> Unit = {},
 ) {
     HomeBody(
         onNavigateToList = onNavigateToList,
+        onBackClick = onBackClick,
     ) {
         val homeData = homeState.homeData
         if (homeData.series.isNotEmpty()) {
@@ -173,6 +180,7 @@ fun ErrorContent(
 private fun HomeBody(
     modifier: Modifier = Modifier,
     onNavigateToList: (String) -> Unit = {},
+    onBackClick: () -> Unit = {},
     content: LazyListScope.() -> Unit
 ) {
 
@@ -217,7 +225,9 @@ private fun HomeBody(
                 content()
             } else {
                 item {
-                    SearchView()
+                    SearchTextField(onBackClick = {
+                        isSearchMode = false
+                    })
                 }
             }
         }
@@ -265,7 +275,7 @@ private fun HomeSearchBar(
             modifier = Modifier
                 .weight(1f)
                 .padding(16.dp),
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }

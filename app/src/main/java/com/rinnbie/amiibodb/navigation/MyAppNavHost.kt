@@ -24,11 +24,14 @@ fun MyAppNavHost(
         modifier = modifier, navController = navController, startDestination = startDestination
     ) {
         composable("home") {
-            HomeRoute(onNavigateToList = { arg ->
-                val route = if (arg == "all") "list/all" else "list/$arg"
-                Log.d("MyAppNavHost", "navigate to $route")
-                navController.navigate(route = route)
-            })
+            HomeRoute(
+                onNavigateToList = { arg ->
+                    val route = if (arg == "all") "list/all" else "list/$arg"
+                    Log.d("MyAppNavHost", "navigate to $route")
+                    navController.navigate(route = route)
+                }, onBackClick = {
+                    navController.popBackStack()
+                })
         }
         composable(route = "list/{seriesArg}",
             arguments = listOf(
