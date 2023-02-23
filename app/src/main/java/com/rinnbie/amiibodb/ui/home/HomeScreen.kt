@@ -266,7 +266,7 @@ private fun HomeSearchBar(
                 .weight(1f)
                 .padding(16.dp),
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.outline
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
