@@ -221,13 +221,10 @@ private fun HomeBody(
             verticalArrangement = Arrangement.spacedBy(16.dp * offset),
             contentPadding = PaddingValues(bottom = 48.dp * offset)
         ) {
-            item {
-                AnimatedVisibility(visible = !isSearchMode) {
+            if (!isSearchMode) {
+                item {
                     HomeHeader()
                 }
-            }
-
-            if (!isSearchMode) {
                 item {
                     HomeSearchBar(onSearchBarClick = {
                         onClearClick()
