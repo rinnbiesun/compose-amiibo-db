@@ -9,6 +9,7 @@ interface AmiiboDataSource {
     fun getAllSeries(): Flow<List<Series>>
     fun getAmiibo(id: String): Flow<Amiibo>
     fun getAmiibosBySeries(seriesName: String): Flow<List<Amiibo>>
+    fun search(query: String): Flow<List<Amiibo>>
     suspend fun saveAmiibo(amiibo: Amiibo)
     suspend fun saveSeries(series: Series)
     suspend fun deleteAllAmiibos()

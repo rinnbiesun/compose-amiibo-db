@@ -41,6 +41,10 @@ class DefaultAmiiboRepository @Inject constructor(
         return localDataSource.getAmiibo(id)
     }
 
+    override fun search(query: String): Flow<List<Amiibo>> {
+        return localDataSource.search(query)
+    }
+
     private fun getRemoteAllAmiibos() = remoteDataSource.getAllAmiibos().map { amiibos ->
         amiibos.onEach { amiibo -> localDataSource.saveAmiibo(amiibo) }
     }

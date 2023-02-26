@@ -32,6 +32,18 @@ class HomeViewModel @Inject constructor(
 
     val query = MutableStateFlow("")
 
+    val searchResultState: StateFlow<List<Amiibo>> = query
+        .debounce(500)
+        .flatMapLatest {
+            amiiboRepository.search(it)
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
+
+
     init {
         refreshUiState()
     }

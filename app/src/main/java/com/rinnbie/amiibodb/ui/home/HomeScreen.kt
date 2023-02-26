@@ -3,6 +3,7 @@ package com.rinnbie.amiibodb.ui.home
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +35,7 @@ import com.google.accompanist.placeholder.shimmer
 import com.rinnbie.amiibodb.R
 import com.rinnbie.amiibodb.data.Series
 import com.rinnbie.amiibodb.model.HomeData
+import com.rinnbie.amiibodb.ui.amiibo.AmiiboItem
 import com.rinnbie.amiibodb.ui.search.SearchTextField
 import com.rinnbie.amiibodb.ui.theme.AmiiboDBTheme
 import com.rinnbie.amiibodb.ui.theme.Shapes
@@ -42,21 +45,19 @@ import com.rinnbie.amiibodb.ui.theme.Shapes
 fun HomeRoute(
     modifier: Modifier = Modifier,
     onNavigateToList: (String) -> Unit,
-    onBackClick: () -> Unit,
+    onAmiiboClick: (String) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val homeState: HomeUiState by viewModel.homeUiState.collectAsStateWithLifecycle()
-    val query: String by viewModel.query.collectAsStateWithLifecycle()
+    val homeState by viewModel.homeUiState.collectAsStateWithLifecycle()
 
     HomeScreen(
         modifier = modifier,
         homeState = homeState,
-        query = query,
         onNavigateToList = onNavigateToList,
         onTryAgainClick = {
             viewModel.refreshUiState()
         },
-        onBackClick = onBackClick,
+        onAmiiboClick = onAmiiboClick,
         onClearClick = viewModel::clearQuery,
         onQueryChange = viewModel::search
     )
@@ -66,10 +67,9 @@ fun HomeRoute(
 internal fun HomeScreen(
     modifier: Modifier = Modifier,
     homeState: HomeUiState,
-    query: String,
     onNavigateToList: (String) -> Unit,
     onTryAgainClick: () -> Unit = {},
-    onBackClick: () -> Unit = {},
+    onAmiiboClick: (String) -> Unit,
     onClearClick: () -> Unit = {},
     onQueryChange: (String) -> Unit = {},
 ) {
@@ -89,9 +89,8 @@ internal fun HomeScreen(
             HomeContentScreen(
                 modifier = modifier,
                 homeState = homeState,
-                query = query,
                 onNavigateToList = onNavigateToList,
-                onBackClick = onBackClick,
+                onAmiiboClick = onAmiiboClick,
                 onClearClick = onClearClick,
                 onQueryChange = onQueryChange
             )
@@ -118,16 +117,14 @@ private fun HomeLoadingScreen() {
 private fun HomeContentScreen(
     modifier: Modifier = Modifier,
     homeState: HomeUiState.Success,
-    query: String = "",
     onNavigateToList: (String) -> Unit = {},
-    onBackClick: () -> Unit = {},
+    onAmiiboClick: (String) -> Unit = {},
     onClearClick: () -> Unit = {},
     onQueryChange: (String) -> Unit = {},
 ) {
     HomeBody(
-        query = query,
         onNavigateToList = onNavigateToList,
-        onBackClick = onBackClick,
+        onAmiiboClick = onAmiiboClick,
         onClearClick = onClearClick,
         onQueryChange = onQueryChange,
     ) {
@@ -191,19 +188,21 @@ fun ErrorContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun HomeBody(
     modifier: Modifier = Modifier,
-    query: String = "",
     onNavigateToList: (String) -> Unit = {},
-    onBackClick: () -> Unit = {},
+    onAmiiboClick: (String) -> Unit = {},
     onClearClick: () -> Unit = {},
     onQueryChange: (String) -> Unit = {},
+    viewModel: HomeViewModel = hiltViewModel(),
     content: LazyListScope.() -> Unit
 ) {
+    val query by viewModel.query.collectAsStateWithLifecycle()
+    val searchResultState by viewModel.searchResultState.collectAsStateWithLifecycle()
 
-    var isSearchMode by remember { mutableStateOf(false) }
+    var isSearchMode by rememberSaveable { mutableStateOf(false) }
     val offset by animateFloatAsState(targetValue = if (isSearchMode) 0f else 1f)
 
     Column {
@@ -231,6 +230,7 @@ private fun HomeBody(
             if (!isSearchMode) {
                 item {
                     HomeSearchBar(onSearchBarClick = {
+                        onClearClick()
                         isSearchMode = true
                     })
                 }
@@ -243,7 +243,7 @@ private fun HomeBody(
                 }
                 content()
             } else {
-                item {
+                stickyHeader {
                     SearchTextField(
                         query = query,
                         onBackClick = {
@@ -252,6 +252,22 @@ private fun HomeBody(
                         onClearClick = onClearClick,
                         onQueryChange = onQueryChange
                     )
+                }
+                val cols = 3
+                items(searchResultState.chunked(3)) { items ->
+                    Row(
+                        modifier = modifier.padding(horizontal = 8.dp),
+                    ) {
+                        for ((index, item) in items.withIndex()) {
+                            AmiiboItem(
+                                modifier = modifier
+                                    .fillMaxWidth(1f / (cols - index))
+                                    .padding(horizontal = 8.dp, vertical = 8.dp),
+                                amiibo = item,
+                                onAmiiboClick = onAmiiboClick
+                            )
+                        }
+                    }
                 }
             }
         }

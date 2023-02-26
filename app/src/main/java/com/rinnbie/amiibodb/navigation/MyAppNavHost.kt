@@ -29,8 +29,8 @@ fun MyAppNavHost(
                     val route = if (arg == "all") "list/all" else "list/$arg"
                     Log.d("MyAppNavHost", "navigate to $route")
                     navController.navigate(route = route)
-                }, onBackClick = {
-                    navController.popBackStack()
+                }, onAmiiboClick = { id ->
+                    navController.navigate(route = "amiibo/$id")
                 })
         }
         composable(route = "list/{seriesArg}",

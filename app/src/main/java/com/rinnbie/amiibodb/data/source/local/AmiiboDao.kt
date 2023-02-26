@@ -21,6 +21,9 @@ interface AmiiboDao {
     @Query("SELECT * FROM Amiibo WHERE id = :id")
     fun getAmiibo(id: String): Flow<Amiibo>
 
+    @Query("SELECT * FROM Amiibo WHERE character = :query")
+    fun search(query: String): Flow<List<Amiibo>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSeries(series: Series)
 
