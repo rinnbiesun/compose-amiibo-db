@@ -40,6 +40,7 @@ import com.rinnbie.amiibodb.ui.search.SearchTextField
 import com.rinnbie.amiibodb.ui.theme.AmiiboDBTheme
 import com.rinnbie.amiibodb.ui.theme.Shapes
 
+const val cols = 3
 
 @Composable
 fun HomeRoute(
@@ -130,7 +131,6 @@ private fun HomeContentScreen(
     ) {
         val homeData = homeState.homeData
         if (homeData.series.isNotEmpty()) {
-            val cols = 3
             items(homeData.series.chunked(cols)) { items ->
                 Row {
                     for ((index, item) in items.withIndex()) {
@@ -250,8 +250,7 @@ private fun HomeBody(
                         onQueryChange = onQueryChange
                     )
                 }
-                val cols = 3
-                items(searchResultState.chunked(3)) { items ->
+                items(searchResultState.chunked(cols)) { items ->
                     Row(
                         modifier = modifier.padding(horizontal = 8.dp),
                     ) {

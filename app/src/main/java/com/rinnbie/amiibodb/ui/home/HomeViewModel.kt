@@ -33,7 +33,7 @@ class HomeViewModel @Inject constructor(
     val query = MutableStateFlow("")
 
     val searchResultState: StateFlow<List<Amiibo>> = query
-        .debounce(500)
+        .distinctUntilChangedBy { it }
         .flatMapLatest {
             amiiboRepository.search(it)
         }
@@ -119,7 +119,9 @@ class HomeViewModel @Inject constructor(
     }
 
     fun clearQuery() {
-        query.tryEmit("")
+        viewModelScope.launch {
+            this@HomeViewModel.query.emit("")
+        }
     }
 }
 
