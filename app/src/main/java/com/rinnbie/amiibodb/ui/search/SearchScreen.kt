@@ -20,7 +20,9 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.rinnbie.amiibodb.R
@@ -36,12 +38,29 @@ fun SearchTextField(
     Surface(color = MaterialTheme.colorScheme.surfaceVariant) {
         val focusRequester = remember { FocusRequester() }
 
+        val textFieldValue = remember {
+            mutableStateOf(
+                TextFieldValue(
+                    text = query,
+                    selection = TextRange(query.length)
+                )
+            )
+        }
+
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
         }
 
         BasicTextField(
-            value = query,
+            value = textFieldValue.value,
+            onValueChange = {
+                val searchingText = it.text
+                textFieldValue.value = TextFieldValue(
+                    text = searchingText,
+                    selection = TextRange(searchingText.length)
+                )
+                onQueryChange(searchingText)
+            },
             modifier = Modifier
                 .height(72.dp)
                 .focusRequester(focusRequester)
@@ -55,7 +74,6 @@ fun SearchTextField(
                 },
             textStyle = MaterialTheme.typography.bodyLarge,
             singleLine = true,
-            onValueChange = onQueryChange,
             decorationBox = { innerTextField ->
                 SearchTextFieldLayout(
                     onBackClick = onBackClick,
