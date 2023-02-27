@@ -11,7 +11,6 @@ Amiibo database using Jetpack Compose
 
 ### In Progress
 
-- [ ] Amiibo Details Page
 - [ ] Search feature
 
 ### Done ✓
@@ -22,6 +21,9 @@ Amiibo database using Jetpack Compose
 - [x] CI/CD pipeline with GitHub Actions (Generate a version tag & Create a GitHub release)
 - [x] Auto sync the remote data
 - [x] No network handling
+- [x] Amiibo Details Page
+- [x] Search feature
+- [x] Amiibo Details Page
 
 
 ## Screenshot
